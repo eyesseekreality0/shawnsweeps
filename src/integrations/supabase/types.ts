@@ -21,6 +21,7 @@ export type Database = {
           email: string
           game_name: string | null
           id: string
+          paid_at: string | null
           paidly_invoice_id: string | null
           phone: string
           status: string | null
@@ -34,6 +35,7 @@ export type Database = {
           email: string
           game_name?: string | null
           id?: string
+          paid_at?: string | null
           paidly_invoice_id?: string | null
           phone: string
           status?: string | null
@@ -47,6 +49,7 @@ export type Database = {
           email?: string
           game_name?: string | null
           id?: string
+          paid_at?: string | null
           paidly_invoice_id?: string | null
           phone?: string
           status?: string | null
@@ -79,6 +82,50 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          deposit_id: string | null
+          event_type: string
+          id: string
+          invoice_id: string | null
+          payload: Json
+          processed_at: string
+          provider: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          deposit_id?: string | null
+          event_type: string
+          id?: string
+          invoice_id?: string | null
+          payload: Json
+          processed_at?: string
+          provider: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          deposit_id?: string | null
+          event_type?: string
+          id?: string
+          invoice_id?: string | null
+          payload?: Json
+          processed_at?: string
+          provider?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_deposit_id_fkey"
+            columns: ["deposit_id"]
+            isOneToOne: false
+            referencedRelation: "deposits"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,6 +23,9 @@ const depositSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number"),
   gameName: z.string().min(1, "Game name is required"),
   amount: z.string().min(1, "Amount is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be a valid number greater than 0"),
+  paymentMethod: z.enum(["bitcoin", "lightning"], {
+    required_error: "Please select a payment method",
+  }),
 });
 
 type DepositFormData = z.infer<typeof depositSchema>;
@@ -39,13 +43,15 @@ export const DepositForm = () => {
       phone: "",
       gameName: "",
       amount: "",
+      paymentMethod: "bitcoin" as const,
     },
   });
 
   const onSubmit = async (data: DepositFormData) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
+      // First, create the deposit record
+      const { data: depositData, error: depositError } = await supabase
         .from("deposits")
         .insert({
           username: data.username,
@@ -55,15 +61,44 @@ export const DepositForm = () => {
           amount: parseFloat(data.amount),
           status: "pending",
           user_id: null,
-        });
+        })
+        .select()
+        .single();
 
-      if (error) {
-        throw error;
+      if (depositError) {
+        throw depositError;
       }
 
+      // Create Paidly invoice
+      const { data: invoiceResponse, error: invoiceError } = await supabase.functions.invoke('create-paidly-invoice', {
+        body: {
+          amount: parseFloat(data.amount),
+          currency: "USD",
+          customerEmail: data.email,
+          description: `Casino deposit for ${data.gameName}`,
+          metadata: {
+            depositId: depositData.id,
+            username: data.username,
+            gameName: data.gameName,
+            paymentMethod: data.paymentMethod,
+          },
+        },
+      });
+
+      if (invoiceError) {
+        throw new Error(invoiceError.message || "Failed to create payment invoice");
+      }
+
+      if (!invoiceResponse.success) {
+        throw new Error(invoiceResponse.error || "Failed to create payment invoice");
+      }
+
+      // Redirect to Paidly checkout
+      window.open(invoiceResponse.checkoutLink, '_blank');
+
       toast({
-        title: "Deposit Request Submitted",
-        description: "Your deposit request has been submitted successfully. We'll process it shortly.",
+        title: "Payment Created",
+        description: "Redirecting to payment page. Complete your Bitcoin payment to finalize the deposit.",
       });
 
       form.reset();
@@ -72,7 +107,7 @@ export const DepositForm = () => {
       console.error("Error submitting deposit:", error);
       toast({
         title: "Error",
-        description: "Failed to submit deposit request. Please try again.",
+        description: error.message || "Failed to submit deposit request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -165,6 +200,43 @@ export const DepositForm = () => {
                   <FormLabel>Amount ($)</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" min="0" placeholder="Enter deposit amount" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Payment Method</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="bitcoin" id="bitcoin" />
+                        <label
+                          htmlFor="bitcoin"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Bitcoin (On-chain)
+                        </label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="lightning" id="lightning" />
+                        <label
+                          htmlFor="lightning"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Lightning Network (Instant)
+                        </label>
+                      </div>
+                    </RadioGroup>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

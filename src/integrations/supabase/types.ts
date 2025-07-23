@@ -21,6 +21,7 @@ export type Database = {
           email: string
           game_name: string | null
           id: string
+          paidly_invoice_id: string | null
           phone: string
           status: string | null
           updated_at: string
@@ -33,6 +34,7 @@ export type Database = {
           email: string
           game_name?: string | null
           id?: string
+          paidly_invoice_id?: string | null
           phone: string
           status?: string | null
           updated_at?: string
@@ -45,6 +47,7 @@ export type Database = {
           email?: string
           game_name?: string | null
           id?: string
+          paidly_invoice_id?: string | null
           phone?: string
           status?: string | null
           updated_at?: string

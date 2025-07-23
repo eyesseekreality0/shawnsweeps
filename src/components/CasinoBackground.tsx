@@ -10,11 +10,11 @@ export const CasinoBackground = () => {
           playsInline
           className="w-full h-full object-cover"
         >
-          {/* You can replace this with any casino video URL */}
-          <source src="https://cdn.pixabay.com/video/2023/04/21/158788-822037001_large.mp4" type="video/mp4" />
+          {/* Epic casino space background video */}
+          <source src="https://cdn.pixabay.com/video/2023/07/15/170798-846894298_large.mp4" type="video/mp4" />
           
           {/* Fallback for browsers that don't support video */}
-          <div className="w-full h-full bg-gradient-to-br from-purple-900 via-red-900 to-yellow-900"></div>
+          <div className="w-full h-full bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900"></div>
         </video>
       </div>
       

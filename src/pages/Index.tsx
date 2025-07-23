@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { CasinoBackground } from "@/components/CasinoBackground";
+import { DepositForm } from "@/components/DepositForm";
 import { games } from "@/data/games";
 import { ExternalLink } from "lucide-react";
 
@@ -14,7 +15,7 @@ const Index = () => {
       <div className="relative z-10">
         
         {/* Logo Section */}
-        <section className="text-center py-8">
+        <section className="text-center py-4">
           <img 
             src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" 
             alt="Shawn Sweepstakes Logo" 
@@ -23,7 +24,7 @@ const Index = () => {
         </section>
 
         {/* Social Media Links */}
-        <section className="flex justify-center py-4">
+        <section className="flex justify-center py-2">
           <a 
             href="https://www.facebook.com/profile.php?id=61556412457080&mibextid=wwXIfr&mibextid=wwXIfr"
             target="_blank"
@@ -36,8 +37,13 @@ const Index = () => {
           </a>
         </section>
 
+        {/* Deposit Button */}
+        <section className="text-center py-4">
+          <DepositForm />
+        </section>
+
         {/* Promotional Banner */}
-        <section className="text-center py-6">
+        <section className="text-center py-4">
           <img 
             src="https://shawn-sweepstakes.carrd.co/assets/images/image02.png?v=0c91e9dc" 
             alt="Special Promotion" 
@@ -46,7 +52,7 @@ const Index = () => {
         </section>
 
         {/* Games Grid */}
-        <section className="px-4 py-8">
+        <section className="px-4 py-4">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {games.map((game) => (

@@ -22,51 +22,46 @@ serve(async (req) => {
     )
 
     // Log the webhook event
-    await supabase
+    const { error: logError } = await supabase
       .from('webhook_logs')
       .insert({
-        provider: 'paidly',
-        event_type: payload.event_type || payload.type || 'unknown',
-        invoice_id: payload.invoice_id || payload.id,
-        payload: payload,
-        status: payload.status
+        event_type: payload.event || payload.event_type || payload.type || 'unknown',
+        payload: payload
       })
 
-    // Handle different event types
-    if (payload.event_type === 'invoice.paid' || payload.status === 'paid' || payload.status === 'settled' || payload.status === 'confirmed') {
-      // Payment was successful
-      const depositId = payload.metadata?.deposit_id || payload.deposit_id
+    if (logError) {
+      console.error('Error logging webhook:', logError)
+    }
 
-      if (depositId) {
-        const { error } = await supabase
-          .from('deposits')
-          .update({ 
-            status: 'completed',
-            paid_at: new Date().toISOString()
-          })
-          .eq('id', depositId)
+    // Process the webhook based on event type
+    const eventType = payload.event || payload.event_type
+    const invoiceId = payload.invoice?.id || payload.id
+    const status = payload.status || payload.invoice?.status
 
-        if (error) {
-          console.error('Error updating deposit status:', error)
-        } else {
-          console.log('Deposit marked as completed:', depositId)
-        }
+    console.log('Processing event:', eventType, 'for invoice:', invoiceId, 'with status:', status)
+
+    // Update deposit status based on payment events
+    if (eventType === 'invoice.paid' || status === 'paid' || status === 'settled' || status === 'confirmed') {
+      const { error: updateError } = await supabase
+        .from('deposits')
+        .update({ status: 'completed' })
+        .eq('paidly_invoice_id', invoiceId)
+
+      if (updateError) {
+        console.error('Error updating deposit to completed:', updateError)
+      } else {
+        console.log('Deposit marked as completed for invoice:', invoiceId)
       }
-    } else if (payload.event_type === 'invoice.expired' || payload.status === 'expired' || payload.status === 'cancelled') {
-      // Payment failed or expired
-      const depositId = payload.metadata?.deposit_id || payload.deposit_id
+    } else if (eventType === 'invoice.expired' || status === 'expired' || status === 'cancelled') {
+      const { error: updateError } = await supabase
+        .from('deposits')
+        .update({ status: 'failed' })
+        .eq('paidly_invoice_id', invoiceId)
 
-      if (depositId) {
-        const { error } = await supabase
-          .from('deposits')
-          .update({ status: 'failed' })
-          .eq('id', depositId)
-
-        if (error) {
-          console.error('Error updating deposit status:', error)
-        } else {
-          console.log('Deposit marked as failed:', depositId)
-        }
+      if (updateError) {
+        console.error('Error updating deposit to failed:', updateError)
+      } else {
+        console.log('Deposit marked as failed for invoice:', invoiceId)
       }
     }
 

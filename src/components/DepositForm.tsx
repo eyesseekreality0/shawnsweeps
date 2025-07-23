@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Bitcoin, Zap } from 'lucide-react';
 
 const depositSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -29,6 +30,7 @@ type DepositFormData = z.infer<typeof depositSchema>;
 export const DepositForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'bitcoin' | 'lightning'>('bitcoin');
   const { toast } = useToast();
 
   const form = useForm<DepositFormData>({
@@ -75,7 +77,7 @@ export const DepositForm = () => {
             depositId: depositData.id,
             username: data.username,
             gameName: data.gameName,
-            paymentMethod: 'bitcoin' // Default to bitcoin, can be made configurable
+            paymentMethod: paymentMethod
           }
         }
       });
@@ -205,12 +207,36 @@ export const DepositForm = () => {
               )}
             />
             
+            <div className="space-y-2">
+              <FormLabel>Payment Method</FormLabel>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={paymentMethod === 'bitcoin' ? 'default' : 'outline'}
+                  onClick={() => setPaymentMethod('bitcoin')}
+                  className="flex items-center gap-2"
+                >
+                  <Bitcoin className="w-4 h-4" />
+                  Bitcoin
+                </Button>
+                <Button
+                  type="button"
+                  variant={paymentMethod === 'lightning' ? 'default' : 'outline'}
+                  onClick={() => setPaymentMethod('lightning')}
+                  className="flex items-center gap-2"
+                >
+                  <Zap className="w-4 h-4" />
+                  Lightning
+                </Button>
+              </div>
+            </div>
+            
             <Button 
               type="submit" 
               className="w-full bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30" 
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Processing..." : "Submit Deposit Request"}
+              {isSubmitting ? "Processing..." : "Create Payment"}
             </Button>
           </form>
         </Form>

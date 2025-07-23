@@ -45,7 +45,8 @@ export const DepositForm = () => {
   const onSubmit = async (data: DepositFormData) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
+      // First create the deposit record
+      const { data: depositData, error } = await supabase
         .from("deposits")
         .insert({
           username: data.username,
@@ -55,15 +56,48 @@ export const DepositForm = () => {
           amount: parseFloat(data.amount),
           status: "pending",
           user_id: null,
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
         throw error;
       }
 
+      // Create Paidly invoice
+      const { data: invoiceData, error: invoiceError } = await supabase.functions.invoke('create-paidly-invoice', {
+        body: {
+          amount: parseFloat(data.amount),
+          currency: 'USD',
+          customerEmail: data.email,
+          description: `Casino deposit for ${data.gameName}`,
+          metadata: {
+            depositId: depositData.id,
+            username: data.username,
+            gameName: data.gameName,
+            paymentMethod: 'bitcoin' // Default to bitcoin, can be made configurable
+          }
+        }
+      });
+
+      if (invoiceError || !invoiceData.success) {
+        console.error('Error creating invoice:', invoiceError, invoiceData);
+        toast({
+          title: "Payment Setup Error",
+          description: "Failed to create payment invoice. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Open payment URL in new tab
+      if (invoiceData.paymentUrl) {
+        window.open(invoiceData.paymentUrl, '_blank');
+      }
+
       toast({
-        title: "Deposit Request Submitted",
-        description: "Your deposit request has been submitted successfully. We'll process it shortly.",
+        title: "Payment Created",
+        description: "Your payment has been created. Complete the payment in the new tab.",
       });
 
       form.reset();

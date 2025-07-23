@@ -123,10 +123,11 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply text-foreground;
-    background: #1a0f0f;
+    @apply text-foreground font-inter;
+    background: linear-gradient(135deg, #4338ca, #7c3aed, #db2777);
     position: relative;
     overflow-x: hidden;
+    min-height: 100vh;
   }
 
   /* Animated Roulette Background */
@@ -181,7 +182,7 @@ All colors MUST be HSL.
     transform: translate(-50%, -50%);
     z-index: -2;
     animation: roulette-spin 20s linear infinite;
-    opacity: 0.4;
+    opacity: 0.3;
   }
 
   /* Roulette inner ring */

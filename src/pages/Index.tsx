@@ -1,131 +1,124 @@
 import { useState, useMemo } from "react";
-import { Header } from "@/components/Header";
-import { GameCard } from "@/components/GameCard";
 import { CasinoBackground } from "@/components/CasinoBackground";
 import { games } from "@/data/games";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, Grid3X3, List, Star } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 const Index = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-
-  const filteredGames = useMemo(() => {
-    return games.filter(game =>
-      game.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm]);
-
-  
+  const handleGameClick = (gameUrl: string) => {
+    window.open(gameUrl, '_blank', 'noopener,noreferrer');
+  };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative font-inter">
       <CasinoBackground />
       <div className="relative z-10">
-      <Header />
-      
-      {/* Special Promo Section */}
-      <section className="px-4 py-6 max-w-7xl mx-auto">
-        <div className="flex justify-center mb-6">
+        
+        {/* Logo Section */}
+        <section className="text-center py-8">
+          <img 
+            src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" 
+            alt="Shawn Sweepstakes Logo" 
+            className="mx-auto max-w-sm w-full h-auto"
+          />
+        </section>
+
+        {/* Social Media Links */}
+        <section className="flex justify-center gap-4 py-4">
+          <a 
+            href="https://www.facebook.com/profile.php?id=61556412457080&mibextid=wwXIfr&mibextid=wwXIfr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          >
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">f</span>
+            </div>
+          </a>
+          <a 
+            href="https://www.facebook.com/share/1AwSH4yAhj/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          >
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">f</span>
+            </div>
+          </a>
+          <a 
+            href="https://www.facebook.com/NickSweepstakes?mibextid=wwXIfr&mibextid=wwXIfr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          >
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">f</span>
+            </div>
+          </a>
+          <a 
+            href="https://www.facebook.com/profile.php?id=100056952545496&mibextid=LQQJ4d"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          >
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">f</span>
+            </div>
+          </a>
+        </section>
+
+        {/* Promotional Banner */}
+        <section className="text-center py-6">
           <img 
             src="https://shawn-sweepstakes.carrd.co/assets/images/image02.png?v=0c91e9dc" 
             alt="Special Promotion" 
-            className="max-w-full h-auto rounded-lg shadow-red-glow"
+            className="mx-auto max-w-2xl w-full h-auto rounded-lg"
           />
-        </div>
-      </section>
-      
-      {/* Search and Controls */}
-      <section className="px-4 py-4 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row gap-3 mb-6 items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search games..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-card border-border focus:border-casino-gold h-9"
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="flex border border-border rounded-md overflow-hidden">
-              <Button
-                variant={viewMode === "grid" ? "casino" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("grid")}
-                className="rounded-none"
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === "list" ? "casino" : "ghost"}
-                size="sm"
-                onClick={() => setViewMode("list")}
-                className="rounded-none"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
+        </section>
 
-        {/* All Games Section */}
-        <div>
-          <h2 className="text-xl font-bold text-casino-gold mb-4">
-            {searchTerm ? `Search Results (${filteredGames.length})` : "All Games"}
-          </h2>
-          
-          {filteredGames.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No games found matching your search.</p>
-              <Button
-                variant="casino"
-                onClick={() => setSearchTerm("")}
-                className="mt-4"
-              >
-                Show All Games
-              </Button>
-            </div>
-          ) : (
-            <div className={`
-              ${viewMode === "grid" 
-                ? "grid grid-cols-2 md:grid-cols-4 gap-4" 
-                : "space-y-3"
-              }
-            `}>
-              {filteredGames.map((game) => (
+        {/* Games Grid */}
+        <section className="px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {games.map((game) => (
                 <div
                   key={game.id}
-                  className={`transition-all duration-300 ${
-                    viewMode === "list" ? "flex" : ""
-                  }`}
+                  onClick={() => handleGameClick(game.gameUrl)}
+                  className="group cursor-pointer transition-all duration-300 hover:scale-105"
                 >
-                  <GameCard
-                    name={game.name}
-                    imageUrl={game.imageUrl}
-                    gameUrl={game.gameUrl}
-                  />
+                  <div className="relative">
+                    <div className="aspect-square rounded-full overflow-hidden border-2 border-casino-gold/30 group-hover:border-casino-gold transition-colors duration-300">
+                      <img
+                        src={game.imageUrl}
+                        alt={game.name}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        onError={(e) => {
+                          e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMUExQTFBIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iI0ZGRCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkdhbWU8L3RleHQ+Cjwvc3ZnPg==';
+                        }}
+                      />
+                    </div>
+                    
+                    {/* External link indicator */}
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-6 h-6 bg-casino-gold rounded-full flex items-center justify-center">
+                        <ExternalLink className="w-3 h-3 text-black" />
+                      </div>
+                    </div>
+                    
+                    {/* Game name (if available and not "Untitled") */}
+                    {game.name && game.name !== "Untitled" && (
+                      <div className="text-center mt-2">
+                        <p className="text-sm text-casino-gold font-medium truncate">
+                          {game.name}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
 
-      {/* Footer */}
-      <footer className="bg-casino-darker border-t border-border py-6">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            © 2024 Shawn Sweepstakes. All rights reserved. Play responsibly.
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Must be 18+ to play. Sweepstakes games are for entertainment purposes only.
-          </p>
-        </div>
-      </footer>
       </div>
     </div>
   );

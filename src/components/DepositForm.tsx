@@ -54,6 +54,7 @@ export const DepositForm = () => {
           game_name: data.gameName,
           amount: parseFloat(data.amount),
           status: "pending",
+          user_id: null,
         });
 
       if (error) {

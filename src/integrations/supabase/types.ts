@@ -24,7 +24,7 @@ export type Database = {
           phone: string
           status: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
           username: string
         }
         Insert: {
@@ -36,7 +36,7 @@ export type Database = {
           phone: string
           status?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           username: string
         }
         Update: {
@@ -48,7 +48,7 @@ export type Database = {
           phone?: string
           status?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           username?: string
         }
         Relationships: []

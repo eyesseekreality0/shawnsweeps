@@ -3,14 +3,10 @@ import { CasinoBackground } from "@/components/CasinoBackground";
 import { DepositForm } from "@/components/DepositForm";
 import { GameSearch } from "@/components/GameSearch";
 import { games } from "@/data/games";
-import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { user, signOut } = useAuth();
 
   const filteredGames = useMemo(() => {
     if (!searchTerm) return games;
@@ -27,35 +23,6 @@ const Index = () => {
     <div className="min-h-screen relative font-inter overflow-x-hidden">
       <CasinoBackground />
       <div className="relative z-10">
-        
-        {/* Auth Section */}
-        <section className="flex justify-end py-3 px-4">
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-casino-gold text-sm">
-                Welcome, {user.email}
-              </span>
-              <Button
-                onClick={signOut}
-                variant="outline"
-                size="sm"
-                className="border-casino-gold/30 text-casino-gold hover:bg-casino-gold/10"
-              >
-                Sign Out
-              </Button>
-            </div>
-          ) : (
-            <Link to="/auth">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="border-casino-gold/30 text-casino-gold hover:bg-casino-gold/10"
-              >
-                Sign In
-              </Button>
-            </Link>
-          )}
-        </section>
         
         {/* Logo Section */}
         <section className="text-center py-3 px-4">

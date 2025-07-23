@@ -26,7 +26,7 @@ serve(async (req) => {
     // Get environment variables
     const paidlyApiKey = Deno.env.get("PAIDLY_API_KEY");
     const paidlyStoreId = Deno.env.get("PAIDLY_STORE_ID");
-    const paidlyBaseUrl = Deno.env.get("PAIDLY_BASE_URL") || "https://api-staging.paidlyinteractive.com";
+    const paidlyBaseUrl = "https://api-staging.paidlyinteractive.com";
 
     if (!paidlyApiKey || !paidlyStoreId) {
       throw new Error("Missing Paidly credentials. Please configure PAIDLY_API_KEY and PAIDLY_STORE_ID in Supabase Edge Function secrets.");

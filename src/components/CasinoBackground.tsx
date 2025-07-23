@@ -6,8 +6,8 @@ export const CasinoBackground = () => {
         <div className="w-full h-full bg-gradient-to-br from-red-900 via-red-800 to-casino-gold/40"></div>
       </div>
       
-      {/* Dark overlay for better text readability */}
-      <div className="video-overlay"></div>
+      {/* Light overlay for better text readability */}
+      <div className="fixed top-0 left-0 w-full h-full bg-black/20 z-[-9]"></div>
       
       {/* Floating casino elements for extra atmosphere */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">

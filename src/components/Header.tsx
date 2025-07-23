@@ -28,28 +28,11 @@ export const Header = () => {
           />
         </div>
         
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-3 tracking-wider">
-          <span className="bg-gradient-to-r from-casino-gold via-casino-red to-casino-gold bg-clip-text text-transparent">
-            SHAWN
-          </span>
-          <br />
-          <span className="bg-gradient-to-r from-casino-red via-casino-gold to-casino-red bg-clip-text text-transparent">
-            SWEEPSTAKES
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 tracking-wider">
+          <span className="text-casino-gold">
+            SHAWN SWEEPSTAKES
           </span>
         </h1>
-        
-        <p className="text-base md:text-lg text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-          Welcome to the ultimate destination for premium sweepstakes gaming. 
-          Discover the finest selection of games and experience the thrill of winning.
-        </p>
-        
-        <div className="mt-6 flex items-center justify-center gap-2 text-casino-gold">
-          <Crown className="w-4 h-4" />
-          <span className="text-xs font-medium tracking-widest uppercase">
-            Royal Gaming Experience
-          </span>
-          <Crown className="w-4 h-4" />
-        </div>
       </div>
     </header>
   );

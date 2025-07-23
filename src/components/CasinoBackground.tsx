@@ -37,8 +37,8 @@ export const CasinoBackground = () => {
         </div>
       </div>
       
-      {/* Ultra-light overlay for perfect text readability */}
-      <div className="fixed top-0 left-0 w-full h-full bg-black/15 z-[-9]"></div>
+      {/* Subtle overlay for depth */}
+      <div className="fixed top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-black/5 z-[-9]"></div>
       
       {/* Floating luxury casino elements */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">

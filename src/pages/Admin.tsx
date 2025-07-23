@@ -54,16 +54,17 @@ export default function AdminPage() {
       const { data, error } = await supabase
         .from('deposits')
         .select('*')
+        .or('paidly_invoice_id.not.is.null,status.neq.pending') // Only show deposits that have been processed
         .order('created_at', { ascending: false })
 
       if (error) throw error
       setDeposits(data || [])
 
-      // Calculate stats
+      // Calculate stats only for processed deposits
       const totalDeposits = data?.length || 0
       const totalAmount = data?.reduce((sum, deposit) => sum + (deposit.amount || 0), 0) || 0
       const completedPayments = data?.filter(d => d.status === 'completed').length || 0
-      const pendingPayments = data?.filter(d => d.status === 'pending' || d.status === 'pending_payment').length || 0
+      const pendingPayments = data?.filter(d => d.status === 'pending_payment').length || 0
 
       setStats({
         totalDeposits,
@@ -232,19 +233,24 @@ export default function AdminPage() {
           <TabsContent value="deposits" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Deposit Transactions</CardTitle>
+                <CardTitle>Processed Deposits</CardTitle>
                 <CardDescription>
-                  View and track all deposit transactions in real-time
+                  View and track deposits that have been sent for payment processing
                 </CardDescription>
                 <div className="flex items-center space-x-2">
                   <Search className="w-4 h-4" />
                   <Input
-                    placeholder="Search deposits..."
+                    placeholder="Search processed deposits..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                   />
                 </div>
+                {deposits.length === 0 && (
+                  <div className="text-center text-muted-foreground py-4">
+                    No processed deposits found. Deposits will appear here once payment processing begins.
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 <Table>

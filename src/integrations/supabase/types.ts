@@ -14,69 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      deposits: {
-        Row: {
-          amount: number | null
-          created_at: string
-          email: string
-          game_name: string | null
-          id: string
-          phone: string
-          status: string | null
-          updated_at: string
-          user_id: string | null
-          username: string
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string
-          email: string
-          game_name?: string | null
-          id?: string
-          phone: string
-          status?: string | null
-          updated_at?: string
-          user_id?: string | null
-          username: string
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string
-          email?: string
-          game_name?: string | null
-          id?: string
-          phone?: string
-          status?: string | null
-          updated_at?: string
-          user_id?: string | null
-          username?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          id: string
-          updated_at: string
-          user_id: string
-          username: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id: string
-          username?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          updated_at?: string
-          user_id?: string
-          username?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never

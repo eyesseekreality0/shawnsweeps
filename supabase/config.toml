@@ -1,11 +1,1 @@
-project_id = "eorigsiksfdadeypbept"
-
-[auth]
-enabled = true
-external_anonymous_users_enabled = false
-
-[functions.create-paidly-invoice]
-verify_jwt = false
-
-[functions.paidly-webhook]
-verify_jwt = false
+project_id = "nuyaderrzprlhxcggygn"

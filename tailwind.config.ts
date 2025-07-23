@@ -56,6 +56,8 @@ export default {
 					red: 'hsl(var(--casino-red))',
 					gold: 'hsl(var(--casino-gold))',
 					'gold-light': 'hsl(var(--casino-gold-light))',
+					pink: 'hsl(var(--casino-pink))',
+					'pink-light': 'hsl(var(--casino-pink-light))',
 					dark: 'hsl(var(--casino-dark))',
 					darker: 'hsl(var(--casino-darker))'
 				},
@@ -118,11 +120,13 @@ export default {
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-card': 'var(--gradient-card)',
-				'gradient-gold': 'var(--gradient-gold)'
+				'gradient-gold': 'var(--gradient-gold)',
+				'gradient-royal': 'var(--gradient-royal)'
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',
 				'red-glow': 'var(--shadow-red-glow)',
+				'pink-glow': 'var(--shadow-pink-glow)',
 				'elegant': 'var(--shadow-elegant)'
 			}
 		}

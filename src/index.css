@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Casino-themed color palette */
+    /* Casino-themed color palette with pink accents */
     --background: 12 6% 15%;
     --foreground: 43 100% 95%;
 
@@ -27,8 +27,8 @@ All colors MUST be HSL.
     --muted: 12 8% 25%;
     --muted-foreground: 43 50% 80%;
 
-    --accent: 43 96% 56%;
-    --accent-foreground: 12 6% 15%;
+    --accent: 325 84% 65%;
+    --accent-foreground: 43 100% 95%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 43 100% 95%;
@@ -37,21 +37,25 @@ All colors MUST be HSL.
     --input: 12 15% 25%;
     --ring: 43 96% 56%;
 
-    /* Custom casino colors */
+    /* Custom casino colors with pink accents */
     --casino-red: 0 84% 60%;
     --casino-gold: 43 96% 56%;
     --casino-gold-light: 43 100% 70%;
+    --casino-pink: 325 84% 65%;
+    --casino-pink-light: 325 84% 75%;
     --casino-dark: 12 6% 10%;
     --casino-darker: 12 6% 8%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--casino-red)), hsl(var(--casino-gold)));
+    /* Enhanced gradients with pink */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--casino-red)), hsl(var(--casino-pink)));
     --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
     --gradient-gold: linear-gradient(135deg, hsl(var(--casino-gold)), hsl(var(--casino-gold-light)));
+    --gradient-royal: linear-gradient(135deg, hsl(var(--casino-red)), hsl(var(--casino-pink)), hsl(var(--casino-gold)));
 
-    /* Shadows */
+    /* Enhanced shadows */
     --shadow-glow: 0 0 30px hsl(var(--casino-gold) / 0.3);
     --shadow-red-glow: 0 0 20px hsl(var(--casino-red) / 0.4);
+    --shadow-pink-glow: 0 0 25px hsl(var(--casino-pink) / 0.4);
     --shadow-elegant: 0 10px 40px -10px hsl(var(--casino-dark) / 0.8);
 
     --radius: 0.5rem;

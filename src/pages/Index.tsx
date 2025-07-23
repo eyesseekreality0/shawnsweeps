@@ -4,12 +4,11 @@ import { GameCard } from "@/components/GameCard";
 import { games } from "@/data/games";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Grid3X3, List, Star, Shuffle } from "lucide-react";
+import { Search, Grid3X3, List, Star } from "lucide-react";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [randomGame, setRandomGame] = useState<string | null>(null);
 
   const filteredGames = useMemo(() => {
     return games.filter(game =>
@@ -17,17 +16,7 @@ const Index = () => {
     );
   }, [searchTerm]);
 
-  const handleRandomGame = () => {
-    const randomIndex = Math.floor(Math.random() * games.length);
-    const selectedGame = games[randomIndex];
-    setRandomGame(selectedGame.id);
-    window.open(selectedGame.gameUrl, '_blank', 'noopener,noreferrer');
-    
-    // Clear the highlight after 3 seconds
-    setTimeout(() => setRandomGame(null), 3000);
-  };
-
-  const featuredGames = games.slice(0, 8);
+  const featuredGames = games.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,16 +37,6 @@ const Index = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button
-              variant="casino"
-              size="sm"
-              onClick={handleRandomGame}
-              className="gap-2"
-            >
-              <Shuffle className="w-4 h-4" />
-              Random Game
-            </Button>
-            
             <div className="flex border border-border rounded-md overflow-hidden">
               <Button
                 variant={viewMode === "grid" ? "casino" : "ghost"}
@@ -86,13 +65,11 @@ const Index = () => {
               <Star className="w-5 h-5 text-casino-gold" />
               <h2 className="text-2xl font-bold text-foreground">Featured Games</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredGames.map((game) => (
                 <div
                   key={game.id}
-                  className={`transition-all duration-300 ${
-                    randomGame === game.id ? 'ring-2 ring-casino-gold animate-pulse' : ''
-                  }`}
+                  className="transition-all duration-300"
                 >
                   <GameCard
                     name={game.name}
@@ -125,7 +102,7 @@ const Index = () => {
           ) : (
             <div className={`
               ${viewMode === "grid" 
-                ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4" 
+                ? "grid grid-cols-1 md:grid-cols-3 gap-6" 
                 : "space-y-4"
               }
             `}>
@@ -133,8 +110,6 @@ const Index = () => {
                 <div
                   key={game.id}
                   className={`transition-all duration-300 ${
-                    randomGame === game.id ? 'ring-2 ring-casino-gold animate-pulse' : ''
-                  } ${
                     viewMode === "list" ? "flex" : ""
                   }`}
                 >

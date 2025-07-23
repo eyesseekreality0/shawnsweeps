@@ -15,7 +15,7 @@ export const GameCard = ({ name, imageUrl, gameUrl }: GameCardProps) => {
   return (
     <Card 
       onClick={handleClick}
-      className="group relative overflow-hidden bg-gradient-card border-border hover:border-casino-pink cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-pink-glow hover:animate-glow"
+      className="group relative overflow-hidden bg-gradient-card border-border hover:border-casino-gold cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-red-glow hover:animate-glow"
     >
       <div className="aspect-[4/5] relative">
         <img
@@ -29,13 +29,13 @@ export const GameCard = ({ name, imageUrl, gameUrl }: GameCardProps) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-casino-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <ExternalLink className="w-5 h-5 text-casino-pink" />
+          <ExternalLink className="w-5 h-5 text-casino-gold" />
         </div>
       </div>
       
       {name && name !== "Untitled" && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-casino-dark to-transparent">
-          <h3 className="text-base font-semibold text-casino-pink truncate">
+        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-casino-dark to-transparent">
+          <h3 className="text-sm font-semibold text-casino-gold truncate">
             {name}
           </h3>
         </div>

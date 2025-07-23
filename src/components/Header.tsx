@@ -2,7 +2,7 @@ import { Crown, Sparkles } from "lucide-react";
 
 export const Header = () => {
   return (
-    <header className="relative overflow-hidden bg-gradient-royal p-8 md:p-12">
+    <header className="relative overflow-hidden bg-gradient-royal p-6 md:p-8">
       {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-4 left-4 animate-float">
@@ -20,35 +20,35 @@ export const Header = () => {
       </div>
 
       <div className="relative z-10 text-center max-w-4xl mx-auto">
-        <div className="flex items-center justify-center mb-6">
+        <div className="flex items-center justify-center mb-4">
           <img 
             src="/lovable-uploads/fe59b40d-e5fd-4762-858c-1276be42711b.png" 
             alt="Shawn Sweepstakes Logo" 
-            className="w-32 h-32 md:w-40 md:h-40 rounded-full shadow-pink-glow animate-glow object-cover"
+            className="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-red-glow animate-glow object-cover"
           />
         </div>
         
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-4 tracking-wider">
-          <span className="bg-gradient-to-r from-casino-gold via-casino-pink to-casino-gold bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-3 tracking-wider">
+          <span className="bg-gradient-to-r from-casino-gold via-casino-red to-casino-gold bg-clip-text text-transparent">
             SHAWN
           </span>
           <br />
-          <span className="bg-gradient-to-r from-casino-pink via-casino-gold to-casino-pink bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-casino-red via-casino-gold to-casino-red bg-clip-text text-transparent">
             SWEEPSTAKES
           </span>
         </h1>
         
-        <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base md:text-lg text-foreground/80 max-w-2xl mx-auto leading-relaxed">
           Welcome to the ultimate destination for premium sweepstakes gaming. 
           Discover the finest selection of games and experience the thrill of winning.
         </p>
         
-        <div className="mt-8 flex items-center justify-center gap-2 text-casino-pink">
-          <Crown className="w-5 h-5" />
-          <span className="text-sm font-medium tracking-widest uppercase">
+        <div className="mt-6 flex items-center justify-center gap-2 text-casino-gold">
+          <Crown className="w-4 h-4" />
+          <span className="text-xs font-medium tracking-widest uppercase">
             Royal Gaming Experience
           </span>
-          <Crown className="w-5 h-5" />
+          <Crown className="w-4 h-4" />
         </div>
       </div>
     </header>

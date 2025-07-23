@@ -128,6 +128,20 @@ export default {
 					'100%': {
 						transform: 'translate(-50%, -50%) rotate(0deg)'
 					}
+				},
+				'casino-glow': {
+					'0%': {
+						opacity: '0.3',
+						transform: 'scale(1)'
+					},
+					'50%': {
+						opacity: '0.6',
+						transform: 'scale(1.02)'
+					},
+					'100%': {
+						opacity: '0.3',
+						transform: 'scale(1)'
+					}
 				}
 			},
 			animation: {
@@ -135,8 +149,9 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'glow': 'glow 2s ease-in-out infinite',
 				'float': 'float 3s ease-in-out infinite',
-				'roulette-spin': 'roulette-spin 20s linear infinite',
-				'roulette-spin-reverse': 'roulette-spin-reverse 15s linear infinite'
+				'roulette-spin': 'roulette-spin 25s linear infinite',
+				'roulette-spin-reverse': 'roulette-spin-reverse 20s linear infinite',
+				'casino-glow': 'casino-glow 12s ease-in-out infinite alternate'
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',

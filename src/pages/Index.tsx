@@ -23,39 +23,9 @@ const Index = () => {
         </section>
 
         {/* Social Media Links */}
-        <section className="flex justify-center gap-4 py-4">
+        <section className="flex justify-center py-4">
           <a 
             href="https://www.facebook.com/profile.php?id=61556412457080&mibextid=wwXIfr&mibextid=wwXIfr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="opacity-80 hover:opacity-100 transition-opacity"
-          >
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">f</span>
-            </div>
-          </a>
-          <a 
-            href="https://www.facebook.com/share/1AwSH4yAhj/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="opacity-80 hover:opacity-100 transition-opacity"
-          >
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">f</span>
-            </div>
-          </a>
-          <a 
-            href="https://www.facebook.com/NickSweepstakes?mibextid=wwXIfr&mibextid=wwXIfr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="opacity-80 hover:opacity-100 transition-opacity"
-          >
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">f</span>
-            </div>
-          </a>
-          <a 
-            href="https://www.facebook.com/profile.php?id=100056952545496&mibextid=LQQJ4d"
             target="_blank"
             rel="noopener noreferrer"
             className="opacity-80 hover:opacity-100 transition-opacity"

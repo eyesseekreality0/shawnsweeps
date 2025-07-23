@@ -124,85 +124,103 @@ All colors MUST be HSL.
 
   body {
     @apply text-foreground font-inter;
-    background: linear-gradient(135deg, #4338ca, #7c3aed, #db2777);
+    background: 
+      radial-gradient(circle at center, rgba(185, 28, 28, 0.15) 0%, transparent 70%),
+      linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
     position: relative;
     overflow-x: hidden;
     min-height: 100vh;
   }
 
-  /* Animated Roulette Background */
+  /* Animated Roulette Background - Exactly like original */
   .roulette-background {
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 150vmax;
-    height: 150vmax;
-    background: conic-gradient(
-      from 0deg,
-      #dc2626 0deg, #dc2626 9.7deg,
-      #000000 9.7deg, #000000 19.4deg,
-      #dc2626 19.4deg, #dc2626 29.1deg,
-      #000000 29.1deg, #000000 38.8deg,
-      #dc2626 38.8deg, #dc2626 48.5deg,
-      #000000 48.5deg, #000000 58.2deg,
-      #dc2626 58.2deg, #dc2626 67.9deg,
-      #000000 67.9deg, #000000 77.6deg,
-      #dc2626 77.6deg, #dc2626 87.3deg,
-      #000000 87.3deg, #000000 97deg,
-      #dc2626 97deg, #dc2626 106.7deg,
-      #000000 106.7deg, #000000 116.4deg,
-      #dc2626 116.4deg, #dc2626 126.1deg,
-      #000000 126.1deg, #000000 135.8deg,
-      #dc2626 135.8deg, #dc2626 145.5deg,
-      #000000 145.5deg, #000000 155.2deg,
-      #dc2626 155.2deg, #dc2626 164.9deg,
-      #000000 164.9deg, #000000 174.6deg,
-      #dc2626 174.6deg, #dc2626 184.3deg,
-      #000000 184.3deg, #000000 194deg,
-      #dc2626 194deg, #dc2626 203.7deg,
-      #000000 203.7deg, #000000 213.4deg,
-      #dc2626 213.4deg, #dc2626 223.1deg,
-      #000000 223.1deg, #000000 232.8deg,
-      #dc2626 232.8deg, #dc2626 242.5deg,
-      #000000 242.5deg, #000000 252.2deg,
-      #dc2626 252.2deg, #dc2626 261.9deg,
-      #000000 261.9deg, #000000 271.6deg,
-      #dc2626 271.6deg, #dc2626 281.3deg,
-      #000000 281.3deg, #000000 291deg,
-      #dc2626 291deg, #dc2626 300.7deg,
-      #000000 300.7deg, #000000 310.4deg,
-      #dc2626 310.4deg, #dc2626 320.1deg,
-      #000000 320.1deg, #000000 329.8deg,
-      #dc2626 329.8deg, #dc2626 339.5deg,
-      #000000 339.5deg, #000000 349.2deg,
-      #dc2626 349.2deg, #dc2626 358.9deg,
-      #000000 358.9deg, #000000 360deg
-    );
+    width: 200vmax;
+    height: 200vmax;
+    background: 
+      conic-gradient(
+        from 0deg,
+        #dc2626 0deg, #dc2626 9.73deg,
+        #1f2937 9.73deg, #1f2937 19.46deg,
+        #dc2626 19.46deg, #dc2626 29.19deg,
+        #1f2937 29.19deg, #1f2937 38.92deg,
+        #dc2626 38.92deg, #dc2626 48.65deg,
+        #1f2937 48.65deg, #1f2937 58.38deg,
+        #dc2626 58.38deg, #dc2626 68.11deg,
+        #1f2937 68.11deg, #1f2937 77.84deg,
+        #dc2626 77.84deg, #dc2626 87.57deg,
+        #1f2937 87.57deg, #1f2937 97.3deg,
+        #dc2626 97.3deg, #dc2626 107.03deg,
+        #1f2937 107.03deg, #1f2937 116.76deg,
+        #dc2626 116.76deg, #dc2626 126.49deg,
+        #1f2937 126.49deg, #1f2937 136.22deg,
+        #dc2626 136.22deg, #dc2626 145.95deg,
+        #1f2937 145.95deg, #1f2937 155.68deg,
+        #dc2626 155.68deg, #dc2626 165.41deg,
+        #1f2937 165.41deg, #1f2937 175.14deg,
+        #dc2626 175.14deg, #dc2626 184.87deg,
+        #1f2937 184.87deg, #1f2937 194.6deg,
+        #dc2626 194.6deg, #dc2626 204.33deg,
+        #1f2937 204.33deg, #1f2937 214.06deg,
+        #dc2626 214.06deg, #dc2626 223.79deg,
+        #1f2937 223.79deg, #1f2937 233.52deg,
+        #dc2626 233.52deg, #dc2626 243.25deg,
+        #1f2937 243.25deg, #1f2937 252.98deg,
+        #dc2626 252.98deg, #dc2626 262.71deg,
+        #1f2937 262.71deg, #1f2937 272.44deg,
+        #dc2626 272.44deg, #dc2626 282.17deg,
+        #1f2937 282.17deg, #1f2937 291.9deg,
+        #dc2626 291.9deg, #dc2626 301.63deg,
+        #1f2937 301.63deg, #1f2937 311.36deg,
+        #dc2626 311.36deg, #dc2626 321.09deg,
+        #1f2937 321.09deg, #1f2937 330.82deg,
+        #dc2626 330.82deg, #dc2626 340.55deg,
+        #1f2937 340.55deg, #1f2937 350.28deg,
+        #dc2626 350.28deg, #dc2626 360deg
+      );
     border-radius: 50%;
     transform: translate(-50%, -50%);
-    z-index: -2;
-    animation: roulette-spin 20s linear infinite;
-    opacity: 0.3;
+    z-index: -3;
+    animation: roulette-spin 25s linear infinite;
+    opacity: 0.6;
   }
 
-  /* Roulette inner ring */
+  /* Roulette numbers and inner details */
   .roulette-inner {
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 120vmax;
-    height: 120vmax;
-    background: radial-gradient(
-      circle,
-      transparent 40%,
-      rgba(255, 215, 0, 0.1) 42%,
-      rgba(255, 215, 0, 0.3) 44%,
-      rgba(255, 215, 0, 0.1) 46%,
-      transparent 48%
-    );
+    width: 180vmax;
+    height: 180vmax;
+    background: 
+      radial-gradient(
+        circle,
+        transparent 45%,
+        rgba(255, 215, 0, 0.2) 46%,
+        rgba(255, 215, 0, 0.4) 47%,
+        rgba(255, 215, 0, 0.2) 48%,
+        transparent 49%
+      );
     border-radius: 50%;
     transform: translate(-50%, -50%);
+    z-index: -2;
+    animation: roulette-spin-reverse 20s linear infinite;
+  }
+
+  /* Additional casino atmosphere */
+  .casino-atmosphere {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(185, 28, 28, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.02) 0%, transparent 80%);
     z-index: -1;
-    animation: roulette-spin-reverse 15s linear infinite;
+    animation: casino-glow 12s ease-in-out infinite alternate;
   }
 }

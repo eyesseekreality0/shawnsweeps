@@ -2,3 +2,6 @@ project_id = "eorigsiksfdadeypbept"
 
 [functions.create-paidly-invoice]
 verify_jwt = false
+
+[functions.paidly-webhook]
+verify_jwt = false

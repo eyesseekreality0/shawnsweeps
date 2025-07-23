@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -16,10 +15,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const depositSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  email: z.string().email("Please enter a valid email"),
   phone: z.string().min(10, "Please enter a valid phone number"),
   gameName: z.string().min(1, "Game name is required"),
   amount: z.string().min(1, "Amount is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be a valid number greater than 0"),
@@ -31,26 +30,52 @@ export const DepositForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user, session } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<DepositFormData>({
     resolver: zodResolver(depositSchema),
     defaultValues: {
-      username: "",
-      email: "",
       phone: "",
       gameName: "",
       amount: "",
     },
   });
 
+  const handleClick = () => {
+    if (!user || !session) {
+      navigate('/auth');
+      return;
+    }
+    setIsOpen(true);
+  };
+
   const onSubmit = async (data: DepositFormData) => {
+    if (!user || !session) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to submit a deposit request.",
+        variant: "destructive",
+      });
+      navigate('/auth');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // Get user profile to fetch username
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("user_id", user.id)
+        .single();
+
       const { error } = await supabase
         .from("deposits")
         .insert({
-          username: data.username,
-          email: data.email,
+          user_id: user.id,
+          username: profile?.username || "Anonymous",
+          email: user.email || "",
           phone: data.phone,
           game_name: data.gameName,
           amount: parseFloat(data.amount),
@@ -83,8 +108,12 @@ export const DepositForm = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300">
-          Make a Deposit 💰
+        <Button 
+          size="lg" 
+          className="text-lg px-8 py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300"
+          onClick={handleClick}
+        >
+          {user ? "Make a Deposit 💰" : "Sign In to Deposit 💰"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -97,34 +126,6 @@ export const DepositForm = () => {
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your username" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="Enter your email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
             <FormField
               control={form.control}
               name="phone"

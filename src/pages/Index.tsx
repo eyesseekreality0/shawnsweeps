@@ -20,7 +20,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative font-inter overflow-x-hidden">
+    <div className="min-h-screen relative font-inter overflow-x-hidden">
       <CasinoBackground />
       <div className="relative z-10">
         

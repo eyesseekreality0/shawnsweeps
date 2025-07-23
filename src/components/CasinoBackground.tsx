@@ -1,6 +1,10 @@
 export const CasinoBackground = () => {
   return (
     <>
+      {/* Roulette Wheel Background */}
+      <div className="roulette-background"></div>
+      <div className="roulette-inner"></div>
+      
       {/* Floating Casino Elements - Minimal */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Subtle floating elements to complement the roulette */}

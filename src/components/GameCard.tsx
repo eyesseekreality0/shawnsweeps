@@ -15,13 +15,13 @@ export const GameCard = ({ name, imageUrl, gameUrl }: GameCardProps) => {
   return (
     <Card 
       onClick={handleClick}
-      className="group relative overflow-hidden bg-gradient-card border-border hover:border-casino-gold cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-red-glow hover:animate-glow"
+      className="group relative overflow-hidden bg-gradient-card border-border hover:border-casino-gold cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-red-glow hover:animate-glow rounded-full"
     >
-      <div className="aspect-[4/5] relative">
+      <div className="aspect-square relative rounded-full overflow-hidden">
         <img
           src={imageUrl}
           alt={name}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 rounded-full"
           onError={(e) => {
             // Fallback to a placeholder if image fails to load
             e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMUExQTFBIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iI0ZGRCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkdhbWU8L3RleHQ+Cjwvc3ZnPg==';

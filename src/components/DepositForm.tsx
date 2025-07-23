@@ -21,6 +21,7 @@ const depositSchema = z.object({
   username: z.string().min(1, "Username is required"),
   email: z.string().email("Please enter a valid email"),
   phone: z.string().min(10, "Please enter a valid phone number"),
+  gameName: z.string().min(1, "Game name is required"),
   amount: z.string().min(1, "Amount is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be a valid number greater than 0"),
 });
 
@@ -37,6 +38,7 @@ export const DepositForm = () => {
       username: "",
       email: "",
       phone: "",
+      gameName: "",
       amount: "",
     },
   });
@@ -50,6 +52,7 @@ export const DepositForm = () => {
           username: data.username,
           email: data.email,
           phone: data.phone,
+          game_name: data.gameName,
           amount: parseFloat(data.amount),
           status: "pending",
         });
@@ -80,7 +83,7 @@ export const DepositForm = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="casino" size="lg" className="text-lg px-8 py-6 shadow-glow">
+        <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300">
           Make a Deposit 💰
         </Button>
       </DialogTrigger>
@@ -138,6 +141,20 @@ export const DepositForm = () => {
             
             <FormField
               control={form.control}
+              name="gameName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Game Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter the game name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
               name="amount"
               render={({ field }) => (
                 <FormItem>
@@ -152,8 +169,7 @@ export const DepositForm = () => {
             
             <Button 
               type="submit" 
-              className="w-full" 
-              variant="casino"
+              className="w-full bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30" 
               disabled={isSubmitting}
             >
               {isSubmitting ? "Processing..." : "Submit Deposit Request"}

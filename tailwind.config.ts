@@ -109,13 +109,67 @@ export default {
 					'50%': {
 						transform: 'translateY(-10px)'
 					}
+				},
+				'casino-glow': {
+					'0%': {
+						opacity: '0.3',
+						transform: 'scale(1)'
+					},
+					'50%': {
+						opacity: '0.6',
+						transform: 'scale(1.05)'
+					},
+					'100%': {
+						opacity: '0.3',
+						transform: 'scale(1)'
+					}
+				},
+				'casino-float': {
+					'0%': {
+						transform: 'translateX(-100%) rotate(-15deg)'
+					},
+					'100%': {
+						transform: 'translateX(100%) rotate(-15deg)'
+					}
+				},
+				'card-flip': {
+					'0%': {
+						transform: 'rotateY(0deg) translateY(0px)'
+					},
+					'50%': {
+						transform: 'rotateY(180deg) translateY(-20px)'
+					},
+					'100%': {
+						transform: 'rotateY(360deg) translateY(0px)'
+					}
+				},
+				'dice-roll': {
+					'0%': {
+						transform: 'rotate(0deg) scale(1)'
+					},
+					'25%': {
+						transform: 'rotate(90deg) scale(1.1)'
+					},
+					'50%': {
+						transform: 'rotate(180deg) scale(1)'
+					},
+					'75%': {
+						transform: 'rotate(270deg) scale(1.1)'
+					},
+					'100%': {
+						transform: 'rotate(360deg) scale(1)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'glow': 'glow 2s ease-in-out infinite',
-				'float': 'float 3s ease-in-out infinite'
+				'float': 'float 3s ease-in-out infinite',
+				'casino-glow': 'casino-glow 8s ease-in-out infinite alternate',
+				'casino-float': 'casino-float 20s linear infinite',
+				'card-flip': 'card-flip 4s ease-in-out infinite',
+				'dice-roll': 'dice-roll 3s ease-in-out infinite'
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',

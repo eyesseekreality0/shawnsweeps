@@ -124,5 +124,43 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Animated Casino Background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(185, 28, 28, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 60% 40%, rgba(185, 28, 28, 0.05) 0%, transparent 50%);
+    z-index: -2;
+    animation: casino-glow 8s ease-in-out infinite alternate;
+  }
+
+  body::after {
+    content: '♠ ♥ ♦ ♣ 🎲 🎰 💎 ♠ ♥ ♦ ♣ 🎲 🎰 💎 ♠ ♥ ♦ ♣ 🎲 🎰 💎';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    font-size: 2rem;
+    color: rgba(255, 215, 0, 0.1);
+    z-index: -1;
+    white-space: nowrap;
+    line-height: 4rem;
+    animation: casino-float 20s linear infinite;
+    transform: rotate(-15deg);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
   }
 }

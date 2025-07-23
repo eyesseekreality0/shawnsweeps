@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { GameCard } from "@/components/GameCard";
+import { CasinoBackground } from "@/components/CasinoBackground";
 import { games } from "@/data/games";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,9 @@ const Index = () => {
   
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <CasinoBackground />
+      <div className="relative z-10">
       <Header />
       
       {/* Special Promo Section */}
@@ -123,6 +126,7 @@ const Index = () => {
           </p>
         </div>
       </footer>
+      </div>
     </div>
   );
 };

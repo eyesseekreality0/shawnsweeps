@@ -128,39 +128,83 @@ All colors MUST be HSL.
     overflow-x: hidden;
   }
 
-  /* Animated Casino Background */
+  /* Animated Roulette Background */
   body::before {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    width: 150vmax;
+    height: 150vmax;
     background: 
-      radial-gradient(circle at 20% 20%, rgba(185, 28, 28, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 60% 40%, rgba(185, 28, 28, 0.05) 0%, transparent 50%);
+      conic-gradient(
+        from 0deg,
+        #dc2626 0deg, #dc2626 9.7deg,
+        #000000 9.7deg, #000000 19.4deg,
+        #dc2626 19.4deg, #dc2626 29.1deg,
+        #000000 29.1deg, #000000 38.8deg,
+        #dc2626 38.8deg, #dc2626 48.5deg,
+        #000000 48.5deg, #000000 58.2deg,
+        #dc2626 58.2deg, #dc2626 67.9deg,
+        #000000 67.9deg, #000000 77.6deg,
+        #dc2626 77.6deg, #dc2626 87.3deg,
+        #000000 87.3deg, #000000 97deg,
+        #dc2626 97deg, #dc2626 106.7deg,
+        #000000 106.7deg, #000000 116.4deg,
+        #dc2626 116.4deg, #dc2626 126.1deg,
+        #000000 126.1deg, #000000 135.8deg,
+        #dc2626 135.8deg, #dc2626 145.5deg,
+        #000000 145.5deg, #000000 155.2deg,
+        #dc2626 155.2deg, #dc2626 164.9deg,
+        #000000 164.9deg, #000000 174.6deg,
+        #dc2626 174.6deg, #dc2626 184.3deg,
+        #000000 184.3deg, #000000 194deg,
+        #dc2626 194deg, #dc2626 203.7deg,
+        #000000 203.7deg, #000000 213.4deg,
+        #dc2626 213.4deg, #dc2626 223.1deg,
+        #000000 223.1deg, #000000 232.8deg,
+        #dc2626 232.8deg, #dc2626 242.5deg,
+        #000000 242.5deg, #000000 252.2deg,
+        #dc2626 252.2deg, #dc2626 261.9deg,
+        #000000 261.9deg, #000000 271.6deg,
+        #dc2626 271.6deg, #dc2626 281.3deg,
+        #000000 281.3deg, #000000 291deg,
+        #dc2626 291deg, #dc2626 300.7deg,
+        #000000 300.7deg, #000000 310.4deg,
+        #dc2626 310.4deg, #dc2626 320.1deg,
+        #000000 320.1deg, #000000 329.8deg,
+        #dc2626 329.8deg, #dc2626 339.5deg,
+        #000000 339.5deg, #000000 349.2deg,
+        #dc2626 349.2deg, #dc2626 358.9deg,
+        #000000 358.9deg, #000000 360deg
+      );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
     z-index: -2;
-    animation: casino-glow 8s ease-in-out infinite alternate;
+    animation: roulette-spin 20s linear infinite;
+    opacity: 0.6;
   }
 
+  /* Roulette inner ring */
   body::after {
-    content: '♠ ♥ ♦ ♣ 🎲 🎰 💎 ♠ ♥ ♦ ♣ 🎲 🎰 💎 ♠ ♥ ♦ ♣ 🎲 🎰 💎';
+    content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 200%;
-    height: 100%;
-    font-size: 2rem;
-    color: rgba(255, 215, 0, 0.1);
+    top: 50%;
+    left: 50%;
+    width: 120vmax;
+    height: 120vmax;
+    background: 
+      radial-gradient(
+        circle,
+        transparent 40%,
+        rgba(255, 215, 0, 0.1) 42%,
+        rgba(255, 215, 0, 0.3) 44%,
+        rgba(255, 215, 0, 0.1) 46%,
+        transparent 48%
+      );
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
     z-index: -1;
-    white-space: nowrap;
-    line-height: 4rem;
-    animation: casino-float 20s linear infinite;
-    transform: rotate(-15deg);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    flex-wrap: wrap;
+    animation: roulette-spin-reverse 15s linear infinite;
   }
 }

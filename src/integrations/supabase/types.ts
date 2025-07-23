@@ -19,6 +19,7 @@ export type Database = {
           amount: number | null
           created_at: string
           email: string
+          game_name: string | null
           id: string
           phone: string
           status: string | null
@@ -29,6 +30,7 @@ export type Database = {
           amount?: number | null
           created_at?: string
           email: string
+          game_name?: string | null
           id?: string
           phone: string
           status?: string | null
@@ -39,6 +41,7 @@ export type Database = {
           amount?: number | null
           created_at?: string
           email?: string
+          game_name?: string | null
           id?: string
           phone?: string
           status?: string | null

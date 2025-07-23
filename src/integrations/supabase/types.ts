@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      deposits: {
+        Row: {
+          amount: number | null
+          created_at: string
+          email: string
+          game_name: string | null
+          id: string
+          paidly_invoice_id: string | null
+          phone: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+          username: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          email: string
+          game_name?: string | null
+          id?: string
+          paidly_invoice_id?: string | null
+          phone: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          username: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          email?: string
+          game_name?: string | null
+          id?: string
+          paidly_invoice_id?: string | null
+          phone?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          payload: Json
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

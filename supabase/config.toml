@@ -1,13 +1,1 @@
-project_id = "nuyaderrzprlhxcggygn"
-
-[functions.create-speed-checkout]
-verify_jwt = false
-
-[functions.speed-webhook]
-verify_jwt = false
-
-[functions.create-paidly-invoice]
-verify_jwt = false
-
-[functions.paidly-webhook]
-verify_jwt = false
+project_id = "vbeirjdjfvmtwkljscwb"

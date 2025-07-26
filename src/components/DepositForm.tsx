@@ -50,19 +50,34 @@ export const DepositForm = () => {
     },
   });
 
-  const generatePaymentQR = async (amount: number, method: 'bitcoin' | 'lightning') => {
-    // Demo Bitcoin/Lightning addresses - in production these would be generated dynamically
-    const addresses = {
-      bitcoin: 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4', // Demo address
-      lightning: 'lnbc' + (amount * 100000000) + 'n1p0' // Demo Lightning invoice format
-    };
-    
-    const address = addresses[method];
-    const qrData = method === 'bitcoin' 
-      ? `bitcoin:${address}?amount=${amount / 100000000}&label=Casino Deposit`
-      : address;
-    
+  const generatePaymentQR = async (amount: number, method: 'bitcoin' | 'lightning', depositId: string, customerEmail: string, username: string, gameName: string) => {
     try {
+      // Create payment address via Speed API
+      const { data: speedData, error: speedError } = await supabase.functions.invoke('create-speed-checkout', {
+        body: {
+          amount: amount,
+          currency: 'USD',
+          customerEmail: customerEmail,
+          description: `Casino deposit for ${gameName}`,
+          metadata: {
+            depositId: depositId,
+            username: username,
+            gameName: gameName,
+            paymentMethod: method === 'bitcoin' ? 'on_chain' : 'lightning'
+          }
+        }
+      });
+
+      if (speedError || !speedData.success) {
+        console.error('Error creating Speed payment address:', speedError, speedData);
+        return null;
+      }
+
+      const address = speedData.address;
+      const qrData = method === 'bitcoin' 
+        ? `bitcoin:${address}?amount=${amount / 100000000}&label=Casino Deposit`
+        : address;
+      
       const qrUrl = await QRCode.toDataURL(qrData, {
         errorCorrectionLevel: 'M',
         margin: 2,
@@ -70,12 +85,9 @@ export const DepositForm = () => {
         width: 256
       });
       
-      setQrCodeUrl(qrUrl);
-      setPaymentAddress(address);
-      setPaymentAmount(amount);
       return { address, qrUrl };
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      console.error('Error generating payment:', error);
       return null;
     }
   };
@@ -102,24 +114,36 @@ export const DepositForm = () => {
         throw error;
       }
 
-      // Generate QR code for payment
-      const paymentInfo = await generatePaymentQR(parseFloat(data.amount), paymentMethod);
+      // Generate payment address and QR code via TrySpeed
+      const paymentInfo = await generatePaymentQR(
+        parseFloat(data.amount), 
+        paymentMethod, 
+        depositData.id,
+        data.email,
+        data.username,
+        data.gameName
+      );
       
       if (!paymentInfo) {
         toast({
-          title: "Error",
-          description: "Failed to generate payment QR code. Please try again.",
+          title: "Payment Setup Error",
+          description: "Failed to create TrySpeed payment address. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
+      // Set the payment data for display
+      setQrCodeUrl(paymentInfo.qrUrl);
+      setPaymentAddress(paymentInfo.address);
+      setPaymentAmount(parseFloat(data.amount));
+
       // Show the payment interface
       setShowPayment(true);
 
       toast({
-        title: "Deposit Created",
-        description: "Scan the QR code below to complete your payment.",
+        title: "TrySpeed Deposit Created",
+        description: "Scan the QR code below with your Bitcoin wallet to complete payment via TrySpeed.",
       });
 
     } catch (error) {
@@ -290,10 +314,10 @@ export const DepositForm = () => {
           <>
             <DialogHeader>
               <DialogTitle className="text-2xl text-center text-casino-gold">
-                Pay with {paymentMethod === 'bitcoin' ? 'Bitcoin' : 'Lightning'}
+                TrySpeed Payment - {paymentMethod === 'bitcoin' ? 'Bitcoin' : 'Lightning'}
               </DialogTitle>
               <DialogDescription className="text-center">
-                Scan the QR code below with your wallet to complete the payment
+                Scan the QR code with your wallet or copy the TrySpeed payment address
               </DialogDescription>
             </DialogHeader>
             
@@ -318,13 +342,13 @@ export const DepositForm = () => {
                     Amount: ${paymentAmount.toFixed(2)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
+                    TrySpeed {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
                   </p>
                 </div>
                 
                 {/* Address */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Payment Address:</label>
+                  <label className="text-sm font-medium">TrySpeed Payment Address:</label>
                   <div className="flex items-center space-x-2">
                     <Input 
                       value={paymentAddress} 
@@ -345,12 +369,12 @@ export const DepositForm = () => {
               
               {/* Instructions */}
               <div className="bg-muted p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Instructions:</h4>
+                <h4 className="font-medium mb-2">TrySpeed Payment Instructions:</h4>
                 <ol className="text-sm space-y-1 list-decimal list-inside">
                   <li>Open your Bitcoin wallet app</li>
-                  <li>Scan the QR code above or copy the address</li>
+                  <li>Scan the QR code above or copy the TrySpeed address</li>
                   <li>Send exactly ${paymentAmount.toFixed(2)} worth of Bitcoin</li>
-                  <li>Your deposit will be credited once confirmed</li>
+                  <li>TrySpeed will process and your deposit will be credited automatically</li>
                 </ol>
               </div>
               

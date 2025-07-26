@@ -44,8 +44,8 @@ serve(async (req) => {
       )
     }
 
-    // Create payment with Speed API - using the payments endpoint
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/payments', {
+    // Create payment address with Speed API
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/payment_addresses', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
@@ -57,8 +57,6 @@ serve(async (req) => {
         description: description,
         customer_email: customerEmail,
         payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
-        success_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
-        cancel_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,
@@ -76,7 +74,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Failed to create payment: ${speedResponse.status} - ${speedData}` 
+          error: `Failed to create payment address: ${speedResponse.status} - ${speedData}` 
         }),
         { 
           status: 500, 
@@ -86,7 +84,7 @@ serve(async (req) => {
     }
 
     const paymentData = JSON.parse(speedData)
-    console.log('Payment created successfully:', paymentData)
+    console.log('Payment address created successfully:', paymentData)
 
     // Update the deposit record with the checkout session ID
     const supabase = createClient(
@@ -110,7 +108,10 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         payment: paymentData,
-        paymentUrl: paymentData.checkout_url || paymentData.payment_url || paymentData.url
+        address: paymentData.address || paymentData.payment_address,
+        qrCode: paymentData.qr_code,
+        amount: amount,
+        paymentMethod: metadata.paymentMethod
       }),
       { 
         status: 200, 

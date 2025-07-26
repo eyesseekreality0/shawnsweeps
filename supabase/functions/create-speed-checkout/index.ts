@@ -32,6 +32,8 @@ serve(async (req) => {
 
     // Get Speed API key from environment
     const speedApiKey = Deno.env.get('SPEED_API_KEY')
+    console.log('Speed API Key present:', !!speedApiKey)
+    console.log('Speed API Key prefix:', speedApiKey?.substring(0, 10) + '...')
 
     if (!speedApiKey) {
       console.error('Missing Speed API key')
@@ -44,11 +46,14 @@ serve(async (req) => {
       )
     }
 
-    // Create checkout session with Speed API - using basic auth
+    // Create checkout session with Speed API - using basic auth (API key as username, no password)
+    const authHeader = btoa(speedApiKey + ':');
+    console.log('Auth header created, length:', authHeader.length);
+    
     const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout_sessions', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
+        'Authorization': `Basic ${authHeader}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },

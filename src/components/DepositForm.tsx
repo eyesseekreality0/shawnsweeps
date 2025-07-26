@@ -74,6 +74,7 @@ export const DepositForm = () => {
 
       if (speedError || !speedData.success) {
         console.error('Error creating Speed payment address:', speedError, speedData);
+        console.error('Full speed response:', speedData);
         return null;
       }
 
@@ -129,8 +130,8 @@ export const DepositForm = () => {
       
       if (!paymentInfo) {
         toast({
-          title: "Payment Setup Error",
-          description: "Failed to create TrySpeed payment address. Please try again.",
+          title: "Payment Setup Error", 
+          description: "Failed to create TrySpeed payment address. Check console for details.",
           variant: "destructive",
         });
         return;

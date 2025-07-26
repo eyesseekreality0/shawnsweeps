@@ -44,11 +44,11 @@ serve(async (req) => {
       )
     }
 
-    // Create checkout session with Speed API - trying the correct endpoint
+    // Create checkout session with Speed API - using basic auth
     const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout_sessions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${speedApiKey}`,
+        'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
@@ -119,7 +119,9 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         payment: paymentData,
-        address: paymentData.payment_address || paymentData.address || paymentData.bitcoin_address || paymentData.lightning_address,
+        paymentLink: paymentData.payment_link || paymentData.url,
+        paymentAddress: paymentData.payment_address || paymentData.address,
+        paymentAddressId: paymentData.payment_address_id || paymentData.id,
         qrCode: paymentData.qr_code || paymentData.qr_code_url,
         amount: amount,
         paymentMethod: metadata.paymentMethod,

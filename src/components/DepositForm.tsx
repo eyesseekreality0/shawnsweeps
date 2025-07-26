@@ -36,6 +36,8 @@ export const DepositForm = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [paymentAddress, setPaymentAddress] = useState<string>('');
+  const [paymentLink, setPaymentLink] = useState<string>('');
+  const [paymentAddressId, setPaymentAddressId] = useState<string>('');
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -75,19 +77,19 @@ export const DepositForm = () => {
         return null;
       }
 
-      const address = speedData.address;
-      const qrData = method === 'bitcoin' 
-        ? `bitcoin:${address}?amount=${amount / 100000000}&label=Casino Deposit`
-        : address;
+      const address = speedData.paymentAddress;
+      const link = speedData.paymentLink;
+      const addressId = speedData.paymentAddressId;
       
-      const qrUrl = await QRCode.toDataURL(qrData, {
+      // Generate QR code for the payment link (TrySpeed checkout page)
+      const qrUrl = await QRCode.toDataURL(link, {
         errorCorrectionLevel: 'M',
         margin: 2,
         scale: 8,
         width: 256
       });
       
-      return { address, qrUrl };
+      return { address, link, addressId, qrUrl };
     } catch (error) {
       console.error('Error generating payment:', error);
       return null;
@@ -137,6 +139,8 @@ export const DepositForm = () => {
       // Set the payment data for display
       setQrCodeUrl(paymentInfo.qrUrl);
       setPaymentAddress(paymentInfo.address);
+      setPaymentLink(paymentInfo.link);
+      setPaymentAddressId(paymentInfo.addressId);
       setPaymentAmount(parseFloat(data.amount));
 
       // Show the payment interface
@@ -177,6 +181,8 @@ export const DepositForm = () => {
     setShowPayment(false);
     setQrCodeUrl('');
     setPaymentAddress('');
+    setPaymentLink('');
+    setPaymentAddressId('');
     setPaymentAmount(0);
     form.reset();
   };
@@ -359,6 +365,17 @@ export const DepositForm = () => {
                   <p className="text-sm text-muted-foreground">
                     TrySpeed {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
                   </p>
+                </div>
+                
+                {/* Payment Link Button */}
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => window.open(paymentLink, '_blank')}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                    size="lg"
+                  >
+                    Pay with TrySpeed →
+                  </Button>
                 </div>
                 
                 {/* Address */}

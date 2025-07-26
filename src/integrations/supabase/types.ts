@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           amount: number | null
@@ -21,8 +45,8 @@ export type Database = {
           email: string
           game_name: string | null
           id: string
-          paidly_invoice_id: string | null
           phone: string
+          speed_checkout_session_id: string | null
           status: string | null
           updated_at: string
           user_id: string | null
@@ -34,8 +58,8 @@ export type Database = {
           email: string
           game_name?: string | null
           id?: string
-          paidly_invoice_id?: string | null
           phone: string
+          speed_checkout_session_id?: string | null
           status?: string | null
           updated_at?: string
           user_id?: string | null
@@ -47,12 +71,33 @@ export type Database = {
           email?: string
           game_name?: string | null
           id?: string
-          paidly_invoice_id?: string | null
           phone?: string
+          speed_checkout_session_id?: string | null
           status?: string | null
           updated_at?: string
           user_id?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -62,18 +107,21 @@ export type Database = {
           event_type: string
           id: string
           payload: Json
+          source: string | null
         }
         Insert: {
           created_at?: string
           event_type: string
           id?: string
           payload: Json
+          source?: string | null
         }
         Update: {
           created_at?: string
           event_type?: string
           id?: string
           payload?: Json
+          source?: string | null
         }
         Relationships: []
       }

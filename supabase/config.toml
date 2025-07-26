@@ -1,1 +1,4 @@
 project_id = "vbeirjdjfvmtwkljscwb"
+
+[functions.create-speed-checkout]
+verify_jwt = false

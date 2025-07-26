@@ -44,29 +44,30 @@ serve(async (req) => {
       )
     }
 
-    // Create checkout session with Speed API
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout-sessions', {
+    // Create payment address with Speed API - using payment addresses endpoint
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/payment_addresses', {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
+        'Authorization': `Bearer ${speedApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         amount: amount,
         currency: currency.toUpperCase(),
         description: description,
-        customer_email: customerEmail,
-        payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
+        callback_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,
           game_name: metadata.gameName,
+          customer_email: customerEmail
         }
       })
     })
 
     const speedData = await speedResponse.text()
     console.log('Speed API response status:', speedResponse.status)
+    console.log('Speed API response headers:', Object.fromEntries(speedResponse.headers.entries()))
     console.log('Speed API response:', speedData)
 
     if (!speedResponse.ok) {

@@ -44,8 +44,8 @@ serve(async (req) => {
       )
     }
 
-    // Create payment address with Speed API
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/payment_addresses', {
+    // Create checkout session with Speed API
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout-sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
@@ -55,6 +55,8 @@ serve(async (req) => {
         amount: amount,
         currency: currency.toUpperCase(),
         description: description,
+        customer_email: customerEmail,
+        payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,
@@ -102,14 +104,15 @@ serve(async (req) => {
       console.error('Error updating deposit:', updateError)
     }
 
-    return new Response(
+     return new Response(
       JSON.stringify({ 
         success: true, 
         payment: paymentData,
-        address: paymentData.address || paymentData.payment_address,
-        qrCode: paymentData.qr_code,
+        address: paymentData.payment_address || paymentData.address || paymentData.bitcoin_address || paymentData.lightning_address,
+        qrCode: paymentData.qr_code || paymentData.qr_code_url,
         amount: amount,
-        paymentMethod: metadata.paymentMethod
+        paymentMethod: metadata.paymentMethod,
+        checkoutSessionId: paymentData.id
       }),
       { 
         status: 200, 

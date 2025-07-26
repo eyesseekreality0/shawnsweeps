@@ -44,23 +44,24 @@ serve(async (req) => {
       )
     }
 
-    // Create payment address with Speed API - using payment addresses endpoint
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/payment_addresses', {
+    // Create checkout session with Speed API - trying the correct endpoint
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout_sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${speedApiKey}`,
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
         amount: amount,
         currency: currency.toUpperCase(),
         description: description,
-        callback_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
+        customer_email: customerEmail,
+        payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,
           game_name: metadata.gameName,
-          customer_email: customerEmail
         }
       })
     })
@@ -68,14 +69,23 @@ serve(async (req) => {
     const speedData = await speedResponse.text()
     console.log('Speed API response status:', speedResponse.status)
     console.log('Speed API response headers:', Object.fromEntries(speedResponse.headers.entries()))
-    console.log('Speed API response:', speedData)
+    console.log('Speed API response body:', speedData)
 
     if (!speedResponse.ok) {
-      console.error('Speed API error:', speedData)
+      console.error('Speed API error details:')
+      console.error('Status:', speedResponse.status)
+      console.error('StatusText:', speedResponse.statusText)
+      console.error('Response:', speedData)
+      
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Failed to create payment address: ${speedResponse.status} - ${speedData}` 
+          error: `TrySpeed API error: ${speedResponse.status} - ${speedData}`,
+          details: {
+            status: speedResponse.status,
+            statusText: speedResponse.statusText,
+            body: speedData
+          }
         }),
         { 
           status: 500, 

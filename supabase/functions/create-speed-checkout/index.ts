@@ -44,8 +44,8 @@ serve(async (req) => {
       )
     }
 
-    // Create payment address with Speed API
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/payment_addresses', {
+    // Create payment with Speed API
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/payments', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${btoa(speedApiKey + ':')}`,

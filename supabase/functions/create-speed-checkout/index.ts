@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface PaidlyInvoiceRequest {
+interface SpeedCheckoutRequest {
   amount: number
   currency: string
   customerEmail: string
@@ -15,7 +15,7 @@ interface PaidlyInvoiceRequest {
     depositId: string
     username: string
     gameName: string
-    paymentMethod: 'bitcoin' | 'lightning'
+    paymentMethod: 'lightning' | 'on-chain'
   }
 }
 
@@ -26,18 +26,17 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency, customerEmail, description, metadata }: PaidlyInvoiceRequest = await req.json()
+    const { amount, currency, customerEmail, description, metadata }: SpeedCheckoutRequest = await req.json()
 
-    console.log('Creating Paidly invoice with data:', { amount, currency, customerEmail, description, metadata })
+    console.log('Creating Speed checkout session with data:', { amount, currency, customerEmail, description, metadata })
 
-    // Get Paidly credentials from environment
-    const paidlyApiKey = Deno.env.get('PAIDLY_API_KEY')
-    const paidlyStoreId = Deno.env.get('PAIDLY_STORE_ID')
+    // Get Speed API key from environment
+    const speedApiKey = Deno.env.get('SPEED_API_KEY')
 
-    if (!paidlyApiKey || !paidlyStoreId) {
-      console.error('Missing Paidly credentials')
+    if (!speedApiKey) {
+      console.error('Missing Speed API key')
       return new Response(
-        JSON.stringify({ success: false, error: 'Paidly credentials not configured' }),
+        JSON.stringify({ success: false, error: 'Speed API key not configured' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -45,21 +44,22 @@ serve(async (req) => {
       )
     }
 
-    // Create invoice with Paidly API
-    const paidlyResponse = await fetch('https://api.paidlyinteractive.com/v1/invoices', {
+    // Create checkout session with Speed API
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout_sessions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${paidlyApiKey}`,
+        'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
         'Content-Type': 'application/json',
-        'X-Store-ID': paidlyStoreId,
       },
       body: JSON.stringify({
         amount: amount,
         currency: currency.toUpperCase(),
-        customer_email: customerEmail,
         description: description,
-        payment_method: metadata.paymentMethod,
-        callback_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/paidly-webhook`,
+        customer_email: customerEmail,
+        target_currency: 'SATS', // Convert to Bitcoin/Lightning
+        payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
+        success_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
+        cancel_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,
@@ -68,16 +68,16 @@ serve(async (req) => {
       })
     })
 
-    const paidlyData = await paidlyResponse.text()
-    console.log('Paidly API response status:', paidlyResponse.status)
-    console.log('Paidly API response:', paidlyData)
+    const speedData = await speedResponse.text()
+    console.log('Speed API response status:', speedResponse.status)
+    console.log('Speed API response:', speedData)
 
-    if (!paidlyResponse.ok) {
-      console.error('Paidly API error:', paidlyData)
+    if (!speedResponse.ok) {
+      console.error('Speed API error:', speedData)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Failed to create invoice: ${paidlyResponse.status} - ${paidlyData}` 
+          error: `Failed to create checkout session: ${speedResponse.status} - ${speedData}` 
         }),
         { 
           status: 500, 
@@ -86,10 +86,10 @@ serve(async (req) => {
       )
     }
 
-    const invoiceData = JSON.parse(paidlyData)
-    console.log('Invoice created successfully:', invoiceData)
+    const checkoutData = JSON.parse(speedData)
+    console.log('Checkout session created successfully:', checkoutData)
 
-    // Update the deposit record with the invoice ID
+    // Update the deposit record with the checkout session ID
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -98,7 +98,7 @@ serve(async (req) => {
     const { error: updateError } = await supabase
       .from('deposits')
       .update({ 
-        paidly_invoice_id: invoiceData.id,
+        speed_checkout_session_id: checkoutData.id,
         status: 'pending_payment' 
       })
       .eq('id', metadata.depositId)
@@ -110,8 +110,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        invoice: invoiceData,
-        paymentUrl: invoiceData.payment_url || invoiceData.checkout_url
+        checkout: checkoutData,
+        paymentUrl: checkoutData.url
       }),
       { 
         status: 200, 
@@ -120,7 +120,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error creating Paidly invoice:', error)
+    console.error('Error creating Speed checkout session:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

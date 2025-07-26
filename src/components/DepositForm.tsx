@@ -66,8 +66,8 @@ export const DepositForm = () => {
         throw error;
       }
 
-      // Create Paidly invoice
-      const { data: invoiceData, error: invoiceError } = await supabase.functions.invoke('create-paidly-invoice', {
+      // Create Speed checkout session
+      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-speed-checkout', {
         body: {
           amount: parseFloat(data.amount),
           currency: 'USD',
@@ -77,29 +77,29 @@ export const DepositForm = () => {
             depositId: depositData.id,
             username: data.username,
             gameName: data.gameName,
-            paymentMethod: paymentMethod
+            paymentMethod: paymentMethod === 'bitcoin' ? 'on-chain' : 'lightning'
           }
         }
       });
 
-      if (invoiceError || !invoiceData.success) {
-        console.error('Error creating invoice:', invoiceError, invoiceData);
+      if (checkoutError || !checkoutData.success) {
+        console.error('Error creating checkout session:', checkoutError, checkoutData);
         toast({
           title: "Payment Setup Error",
-          description: "Failed to create payment invoice. Please try again.",
+          description: "Failed to create payment checkout. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       // Open payment URL in new tab
-      if (invoiceData.paymentUrl) {
-        window.open(invoiceData.paymentUrl, '_blank');
+      if (checkoutData.paymentUrl) {
+        window.open(checkoutData.paymentUrl, '_blank');
       }
 
       toast({
         title: "Payment Created",
-        description: "Your payment has been created. Complete the payment in the new tab.",
+        description: "Your Speed payment checkout has been created. Complete the payment in the new tab.",
       });
 
       form.reset();

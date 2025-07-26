@@ -44,8 +44,8 @@ serve(async (req) => {
       )
     }
 
-    // Create checkout session with Speed API
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout_sessions', {
+    // Create payment with Speed API - using the payments endpoint
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/payments', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${btoa(speedApiKey + ':')}`,
@@ -56,7 +56,6 @@ serve(async (req) => {
         currency: currency.toUpperCase(),
         description: description,
         customer_email: customerEmail,
-        target_currency: 'SATS', // Convert to Bitcoin/Lightning
         payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
         success_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
         cancel_url: `${Deno.env.get('SUPABASE_URL')}/functions/v1/speed-webhook`,
@@ -77,7 +76,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Failed to create checkout session: ${speedResponse.status} - ${speedData}` 
+          error: `Failed to create payment: ${speedResponse.status} - ${speedData}` 
         }),
         { 
           status: 500, 
@@ -86,8 +85,8 @@ serve(async (req) => {
       )
     }
 
-    const checkoutData = JSON.parse(speedData)
-    console.log('Checkout session created successfully:', checkoutData)
+    const paymentData = JSON.parse(speedData)
+    console.log('Payment created successfully:', paymentData)
 
     // Update the deposit record with the checkout session ID
     const supabase = createClient(
@@ -98,7 +97,7 @@ serve(async (req) => {
     const { error: updateError } = await supabase
       .from('deposits')
       .update({ 
-        speed_checkout_session_id: checkoutData.id,
+        speed_checkout_session_id: paymentData.id,
         status: 'pending_payment' 
       })
       .eq('id', metadata.depositId)
@@ -110,8 +109,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        checkout: checkoutData,
-        paymentUrl: checkoutData.url
+        payment: paymentData,
+        paymentUrl: paymentData.checkout_url || paymentData.payment_url || paymentData.url
       }),
       { 
         status: 200, 

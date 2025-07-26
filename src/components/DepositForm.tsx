@@ -83,10 +83,10 @@ export const DepositForm = () => {
       });
 
       if (checkoutError || !checkoutData.success) {
-        console.error('Error creating checkout session:', checkoutError, checkoutData);
+        console.error('Error creating payment:', checkoutError, checkoutData);
         toast({
           title: "Payment Setup Error",
-          description: "Failed to create payment checkout. Please try again.",
+          description: "Failed to create payment. Please try again.",
           variant: "destructive",
         });
         return;
@@ -98,8 +98,8 @@ export const DepositForm = () => {
       }
 
       toast({
-        title: "Payment Created",
-        description: "Your Speed payment checkout has been created. Complete the payment in the new tab.",
+        title: "Deposit Created",
+        description: "Your Speed payment has been created. Complete the payment in the new tab.",
       });
 
       form.reset();
@@ -236,7 +236,7 @@ export const DepositForm = () => {
               className="w-full bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30" 
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Processing..." : "Create Payment"}
+              {isSubmitting ? "Processing..." : "Make a Deposit"}
             </Button>
           </form>
         </Form>

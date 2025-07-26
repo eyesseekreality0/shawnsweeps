@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      deposits: {
+        Row: {
+          amount: number
+          created_at: string
+          email: string
+          game_name: string
+          id: string
+          phone: string
+          speed_checkout_session_id: string | null
+          status: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          email: string
+          game_name: string
+          id?: string
+          phone: string
+          speed_checkout_session_id?: string | null
+          status?: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          email?: string
+          game_name?: string
+          id?: string
+          phone?: string
+          speed_checkout_session_id?: string | null
+          status?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

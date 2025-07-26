@@ -19,6 +19,7 @@ import { Bitcoin, Zap, Copy, Check } from 'lucide-react';
 import QRCode from 'qrcode';
 
 const depositSchema = z.object({
+  name: z.string().min(1, "Name is required"),
   username: z.string().min(1, "Username is required"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number"),
@@ -42,6 +43,7 @@ export const DepositForm = () => {
   const form = useForm<DepositFormData>({
     resolver: zodResolver(depositSchema),
     defaultValues: {
+      name: "",
       username: "",
       email: "",
       phone: "",
@@ -105,7 +107,6 @@ export const DepositForm = () => {
           game_name: data.gameName,
           amount: parseFloat(data.amount),
           status: "pending_payment",
-          user_id: null,
         })
         .select()
         .single();
@@ -206,6 +207,20 @@ export const DepositForm = () => {
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
                 <FormField
                   control={form.control}
                   name="username"

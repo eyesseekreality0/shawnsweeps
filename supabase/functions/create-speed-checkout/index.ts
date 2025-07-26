@@ -46,11 +46,11 @@ serve(async (req) => {
       )
     }
 
-    // Create checkout session with Speed API - using basic auth (API key as username, no password)
+    // Try Payment Links API instead of checkout sessions
     const authHeader = btoa(speedApiKey + ':');
     console.log('Auth header created, length:', authHeader.length);
     
-    const speedResponse = await fetch('https://api.tryspeed.com/v1/checkout_sessions', {
+    const speedResponse = await fetch('https://api.tryspeed.com/v1/payment_links', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${authHeader}`,
@@ -62,7 +62,7 @@ serve(async (req) => {
         currency: currency.toUpperCase(),
         description: description,
         customer_email: customerEmail,
-        payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'on_chain'],
+        payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'bitcoin'],
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,

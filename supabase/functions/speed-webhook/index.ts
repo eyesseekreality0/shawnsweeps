@@ -36,39 +36,41 @@ serve(async (req) => {
     }
 
     // Process the webhook based on event type
-    if (webhookPayload.type === 'checkout_session.completed' || 
-        webhookPayload.type === 'payment.succeeded') {
+    if (webhookPayload.type === 'payment_link.completed' || 
+        webhookPayload.type === 'payment.succeeded' ||
+        webhookPayload.type === 'checkout_session.completed') {
       
-      const checkoutSessionId = webhookPayload.data?.object?.id || webhookPayload.data?.id
+      const paymentId = webhookPayload.data?.object?.id || webhookPayload.data?.id
       const metadata = webhookPayload.data?.object?.metadata || webhookPayload.data?.metadata
       
-      if (checkoutSessionId && metadata?.deposit_id) {
+      if (paymentId && metadata?.deposit_id) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'completed' })
-          .eq('speed_checkout_session_id', checkoutSessionId)
+          .eq('speed_checkout_session_id', paymentId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as completed for checkout session:', checkoutSessionId)
+          console.log('Deposit marked as completed for payment:', paymentId)
         }
       }
-    } else if (webhookPayload.type === 'checkout_session.expired' || 
+    } else if (webhookPayload.type === 'payment_link.expired' ||
+               webhookPayload.type === 'checkout_session.expired' || 
                webhookPayload.type === 'payment.failed') {
       
-      const checkoutSessionId = webhookPayload.data?.object?.id || webhookPayload.data?.id
+      const paymentId = webhookPayload.data?.object?.id || webhookPayload.data?.id
       
-      if (checkoutSessionId) {
+      if (paymentId) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'failed' })
-          .eq('speed_checkout_session_id', checkoutSessionId)
+          .eq('speed_checkout_session_id', paymentId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as failed for checkout session:', checkoutSessionId)
+          console.log('Deposit marked as failed for payment:', paymentId)
         }
       }
     }

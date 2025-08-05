@@ -1,7 +1,7 @@
 project_id = "vbeirjdjfvmtwkljscwb"
 
-[functions.create-vert-payment]
+[functions.create-wert-payment]
 verify_jwt = false
 
-[functions.vert-webhook]
+[functions.wert-webhook]
 verify_jwt = false

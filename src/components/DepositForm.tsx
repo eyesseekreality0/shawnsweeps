@@ -16,6 +16,7 @@ import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CreditCard, Loader2, Shield } from 'lucide-react';
+import { createWertPayment } from "@/lib/wert";
 
 const depositSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -69,68 +70,39 @@ export const DepositForm = () => {
 
       console.log('Deposit created successfully:', depositData);
 
-      // Create Vert payment session
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      // Create Wert.io payment session
+      console.log('Creating Wert.io payment for deposit:', depositData.id);
       
-      if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('Missing Supabase configuration:', { supabaseUrl: !!supabaseUrl, supabaseAnonKey: !!supabaseAnonKey });
-        throw new Error('Supabase configuration missing');
-      }
-
-      console.log('Creating Vert payment for deposit:', depositData.id);
-      console.log('Using Supabase URL:', supabaseUrl);
-
-      const apiUrl = `${supabaseUrl}/functions/v1/create-vert-payment`;
-      console.log('Calling Vert API at:', apiUrl);
-      
-      const vertResponse = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${supabaseAnonKey}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: parseFloat(data.amount),
-          currency: 'USD',
-          customerEmail: data.email,
-          description: `Shawn Sweepstakes - ${data.gameName} deposit`,
-          metadata: {
-            depositId: depositData.id,
-            username: data.username,
-            gameName: data.gameName
-          }
-        })
+      const wertResponse = await createWertPayment({
+        amount: parseFloat(data.amount),
+        currency: 'USD',
+        customerEmail: data.email,
+        description: `Shawn Sweepstakes - ${data.gameName} deposit`,
+        metadata: {
+          depositId: depositData.id,
+          username: data.username,
+          gameName: data.gameName
+        }
       });
 
-      console.log('Vert response status:', vertResponse.status);
-      
-      if (!vertResponse.ok) {
-        const errorText = await vertResponse.text();
-        console.error('Vert API error response:', errorText);
-        throw new Error(`Payment service error (${vertResponse.status}): ${errorText}`);
+      console.log('Wert.io payment response:', wertResponse);
+
+      if (!wertResponse.success) {
+        throw new Error(wertResponse.error || 'Failed to create Wert.io payment session');
       }
 
-      const vertData = await vertResponse.json();
-      console.log('Vert payment response:', vertData);
-
-      if (!vertData.success) {
-        throw new Error(vertData.error || 'Failed to create Vert payment session');
-      }
-
-      // Redirect to Vert payment page
-      const paymentUrl = vertData.paymentUrl;
+      // Redirect to Wert.io payment page
+      const paymentUrl = wertResponse.paymentUrl;
       if (paymentUrl) {
-        console.log('Redirecting to payment URL:', paymentUrl);
+        console.log('Redirecting to Wert.io payment URL:', paymentUrl);
         window.open(paymentUrl, '_blank', 'noopener,noreferrer');
       } else {
-        throw new Error('No payment URL received from Vert payment system');
+        throw new Error('No payment URL received from Wert.io payment system');
       }
 
       toast({
         title: "Redirecting to Payment",
-        description: "Opening secure Vert payment page...",
+        description: "Opening secure Wert.io payment page...",
       });
 
       // Close the dialog and reset form
@@ -160,16 +132,16 @@ export const DepositForm = () => {
       <DialogTrigger asChild>
         <Button 
           size="lg" 
-          className="text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation"
+          className="text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-blue-900 to-blue-800 hover:from-blue-800 hover:to-blue-700 text-white border border-blue-500/30 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation"
         >
-          💳 Make Vert Deposit
+          💳 Make Wert Deposit
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Vert Payment Deposit</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Wert.io Payment Deposit</DialogTitle>
           <DialogDescription className="text-center text-sm sm:text-base">
-            Secure deposit via Vert payment system. All fields are required.
+            Secure deposit via Wert.io payment system. All fields are required.
           </DialogDescription>
         </DialogHeader>
         
@@ -292,10 +264,10 @@ export const DepositForm = () => {
             <div className="bg-muted p-3 sm:p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <Shield className="w-4 h-4 mr-2 text-green-600" />
-                <h4 className="text-sm sm:text-base font-medium">Vert Secure Payment:</h4>
+                <h4 className="text-sm sm:text-base font-medium">Wert.io Secure Payment:</h4>
               </div>
               <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
-                <li>Powered by Vert secure payment system</li>
+                <li>Powered by Wert.io secure payment system</li>
                 <li>Bank-level encryption and security</li>
                 <li>No payment details stored on our servers</li>
                 <li>Instant deposit processing</li>
@@ -304,18 +276,18 @@ export const DepositForm = () => {
             
             <Button 
               type="submit" 
-              className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border border-blue-500/30 touch-manipulation" 
+              className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white border border-green-500/30 touch-manipulation" 
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating Vert Payment...
+                  Creating Wert.io Payment...
                 </>
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Continue to Vert Payment
+                  Continue to Wert.io Payment
                 </>
               )}
             </Button>

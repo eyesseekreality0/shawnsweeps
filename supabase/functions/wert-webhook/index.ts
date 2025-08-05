@@ -1,8 +1,9 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { createHmac } from 'node:crypto'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, vert-signature',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, wert-signature',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 }
 
@@ -14,11 +15,24 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.text()
-    const signature = req.headers.get('vert-signature')
+    const signature = req.headers.get('wert-signature')
     
-    console.log('Vert webhook received')
+    console.log('Wert.io webhook received')
     console.log('Signature:', signature)
     console.log('Body:', body)
+
+    // Verify webhook signature
+    const webhookSecret = Deno.env.get('WERT_WEBHOOK_SECRET')
+    if (webhookSecret && signature) {
+      const expectedSignature = createHmac('sha256', webhookSecret)
+        .update(body)
+        .digest('hex')
+      
+      if (signature !== `sha256=${expectedSignature}`) {
+        console.error('Invalid webhook signature')
+        return new Response('Invalid signature', { status: 401 })
+      }
+    }
 
     // Initialize Supabase client
     const supabase = createClient(
@@ -35,69 +49,59 @@ Deno.serve(async (req) => {
       return new Response('Invalid JSON', { status: 400 })
     }
 
-    console.log('Vert webhook event type:', event.type)
-    console.log('Vert webhook event data:', event.data)
-
-    // Log the webhook event
-    const { error: logError } = await supabase
-      .from('webhook_logs')
-      .insert({
-        event_type: event.type,
-        payload: event,
-        source: 'vert'
-      })
-
-    if (logError) {
-      console.error('Error logging webhook:', logError)
-    }
+    console.log('Wert.io webhook event type:', event.type)
+    console.log('Wert.io webhook event data:', event.data)
 
     // Process the webhook based on event type
-    if (event.type === 'payment.completed' || event.type === 'payment_session.completed') {
-      const payment = event.data.object || event.data
-      const paymentId = payment.id
+    if (event.type === 'order_processed' || event.type === 'order.completed') {
+      const order = event.data
+      const orderId = order.id
+      const clickId = order.click_id // This is our deposit ID
       
-      if (paymentId) {
+      if (clickId) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'completed' })
-          .eq('vert_payment_id', paymentId)
+          .eq('id', clickId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as completed for payment:', paymentId)
+          console.log('Deposit marked as completed for order:', orderId)
         }
       }
-    } else if (event.type === 'payment.failed' || event.type === 'payment_session.failed') {
-      const payment = event.data.object || event.data
-      const paymentId = payment.id
+    } else if (event.type === 'order_failed' || event.type === 'order.failed') {
+      const order = event.data
+      const orderId = order.id
+      const clickId = order.click_id
       
-      if (paymentId) {
+      if (clickId) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'failed' })
-          .eq('vert_payment_id', paymentId)
+          .eq('id', clickId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as failed for payment:', paymentId)
+          console.log('Deposit marked as failed for order:', orderId)
         }
       }
-    } else if (event.type === 'payment.cancelled' || event.type === 'payment_session.cancelled') {
-      const payment = event.data.object || event.data
-      const paymentId = payment.id
+    } else if (event.type === 'order_canceled' || event.type === 'order.cancelled') {
+      const order = event.data
+      const orderId = order.id
+      const clickId = order.click_id
       
-      if (paymentId) {
+      if (clickId) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'cancelled' })
-          .eq('vert_payment_id', paymentId)
+          .eq('id', clickId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as cancelled for payment:', paymentId)
+          console.log('Deposit marked as cancelled for order:', orderId)
         }
       }
     }
@@ -111,7 +115,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error processing Vert webhook:', error)
+    console.error('Error processing Wert.io webhook:', error)
     return new Response(
       JSON.stringify({ 
         error: `Webhook processing error: ${error.message}` 

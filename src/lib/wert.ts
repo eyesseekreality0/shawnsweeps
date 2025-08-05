@@ -1,5 +1,5 @@
-// Vert payment utilities for Shawn Sweepstakes
-export const createVertPayment = async (paymentData: {
+// Wert.io payment utilities for Shawn Sweepstakes
+export const createWertPayment = async (paymentData: {
   amount: number;
   currency: string;
   customerEmail: string;
@@ -14,7 +14,7 @@ export const createVertPayment = async (paymentData: {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     
-    const response = await fetch(`${supabaseUrl}/functions/v1/create-vert-payment`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/create-wert-payment`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${supabaseAnonKey}`,
@@ -24,17 +24,17 @@ export const createVertPayment = async (paymentData: {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create Vert payment');
+      throw new Error('Failed to create Wert.io payment');
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error creating Vert payment:', error);
+    console.error('Error creating Wert.io payment:', error);
     throw error;
   }
 };
 
-export const redirectToVertPayment = (paymentUrl: string) => {
+export const redirectToWertPayment = (paymentUrl: string) => {
   window.open(paymentUrl, '_blank', 'noopener,noreferrer');
 };

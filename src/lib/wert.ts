@@ -1,3 +1,5 @@
+import { supabase } from '@/integrations/supabase/client';
+
 // Crypto purchase utilities for Shawn Sweepstakes
 export const createPayment = async (paymentData: {
   amount: number;
@@ -11,8 +13,8 @@ export const createPayment = async (paymentData: {
   };
 }) => {
   try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
-    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseUrl = 'https://vbeirjdjfvmtwkljscwb.supabase.co';
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZWlyamRqZnZtdHdrbGpzY3diIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1MjM4NzAsImV4cCI6MjA2OTA5OTg3MH0.D6wvYJ9AwwuZn56nWq5FFwLCnuAIoyljQM2tR1Ze7DI';
     
     const response = await fetch(`${supabaseUrl}/functions/v1/create-wert-payment`, {
       method: 'POST',

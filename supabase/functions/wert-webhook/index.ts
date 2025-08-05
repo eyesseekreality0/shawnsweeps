@@ -168,7 +168,7 @@ Deno.serve(async (req) => {
         .from('deposits')
         .update({ 
           status: depositStatus,
-          wert_order_id: orderId || clickId,
+          speed_checkout_session_id: orderId || transactionId || clickId,
           updated_at: new Date().toISOString()
         })
         .eq('id', clickId)
@@ -181,7 +181,7 @@ Deno.serve(async (req) => {
         console.log('✅ Deposit updated successfully:', updateData)
       }
     } else {
-      console.log('ℹ️ No valid click_id found, skipping database update')
+      console.log('ℹ️ No valid click_id found or test webhook, skipping database update')
     }
 
     // Always return success to prevent Wert from retrying

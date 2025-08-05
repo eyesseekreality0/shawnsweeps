@@ -1,7 +1,7 @@
 project_id = "vbeirjdjfvmtwkljscwb"
 
-[functions.create-paidly-interactive-checkout]
+[functions.create-stripe-payment-intent]
 verify_jwt = false
 
-[functions.paidly-interactive-webhook]
+[functions.stripe-webhook]
 verify_jwt = false

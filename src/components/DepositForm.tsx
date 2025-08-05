@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,8 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Bitcoin, Zap, Copy, Check } from 'lucide-react';
-import QRCode from 'qrcode';
+import { CreditCard, Loader2 } from 'lucide-react';
+import { loadStripe } from '@stripe/stripe-js';
 
 const depositSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -29,17 +29,15 @@ const depositSchema = z.object({
 
 type DepositFormData = z.infer<typeof depositSchema>;
 
+// Initialize Stripe - you'll need to set your publishable key
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_stripe_publishable_key_here');
+
 export const DepositForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'bitcoin' | 'lightning'>('bitcoin');
   const [showPayment, setShowPayment] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
-  const [paymentAddress, setPaymentAddress] = useState<string>('');
-  const [paymentLink, setPaymentLink] = useState<string>('');
-  const [paymentAddressId, setPaymentAddressId] = useState<string>('');
+  const [clientSecret, setClientSecret] = useState<string>('');
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
-  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<DepositFormData>({
@@ -53,49 +51,6 @@ export const DepositForm = () => {
       amount: "",
     },
   });
-
-  const generatePaymentQR = async (amount: number, method: 'bitcoin' | 'lightning', depositId: string, customerEmail: string, username: string, gameName: string) => {
-    try {
-      // Create payment address via Paidly Interactive API
-      const { data: paidlyData, error: paidlyError } = await supabase.functions.invoke('create-paidly-interactive-checkout', {
-        body: {
-          amount: amount,
-          currency: 'USD',
-          customerEmail: customerEmail,
-          description: `Shawn Sweepstakes deposit for ${gameName}`,
-          metadata: {
-            depositId: depositId,
-            username: username,
-            gameName: gameName,
-            paymentMethod: method
-          }
-        }
-      });
-
-      if (paidlyError || !paidlyData.success) {
-        console.error('Error creating Paidly Interactive checkout session:', paidlyError, paidlyData);
-        console.error('Full paidly response:', paidlyData);
-        return null;
-      }
-
-      const address = paidlyData.paymentAddress;
-      const link = paidlyData.checkoutUrl;
-      const addressId = paidlyData.paymentAddressId;
-      
-      // Generate QR code for the payment link (Paidly Interactive checkout page)
-      const qrUrl = await QRCode.toDataURL(link, {
-        errorCorrectionLevel: 'M',
-        margin: 2,
-        scale: 8,
-        width: 256
-      });
-      
-      return { address, link, addressId, qrUrl };
-    } catch (error) {
-      console.error('Error generating payment:', error);
-      return null;
-    }
-  };
 
   const onSubmit = async (data: DepositFormData) => {
     setIsSubmitting(true);
@@ -118,45 +73,48 @@ export const DepositForm = () => {
         throw error;
       }
 
-      // Generate payment address and QR code via Paidly Interactive
-      const paymentInfo = await generatePaymentQR(
-        parseFloat(data.amount), 
-        paymentMethod, 
-        depositData.id,
-        data.email,
-        data.username,
-        data.gameName
-      );
-      
-      if (!paymentInfo) {
+      // Create Stripe payment intent
+      const { data: stripeData, error: stripeError } = await supabase.functions.invoke('create-stripe-payment-intent', {
+        body: {
+          amount: parseFloat(data.amount),
+          currency: 'USD',
+          customerEmail: data.email,
+          description: `Shawn Sweepstakes deposit for ${data.gameName}`,
+          metadata: {
+            depositId: depositData.id,
+            username: data.username,
+            gameName: data.gameName
+          }
+        }
+      });
+
+      if (stripeError || !stripeData.success) {
+        console.error('Error creating Stripe payment intent:', stripeError, stripeData);
         toast({
           title: "Payment Setup Error", 
-          description: "Failed to create Paidly Interactive payment address. Check console for details.",
+          description: "Failed to create payment session. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       // Set the payment data for display
-      setQrCodeUrl(paymentInfo.qrUrl);
-      setPaymentAddress(paymentInfo.address);
-      setPaymentLink(paymentInfo.link);
-      setPaymentAddressId(paymentInfo.addressId);
+      setClientSecret(stripeData.clientSecret);
       setPaymentAmount(parseFloat(data.amount));
 
       // Show the payment interface
       setShowPayment(true);
 
       toast({
-        title: "Paidly Interactive Deposit Created",
-        description: "Scan the QR code below with your Bitcoin wallet to complete payment via Paidly Interactive.",
+        title: "Payment Session Created",
+        description: "Complete your payment using the secure Stripe checkout.",
       });
 
     } catch (error) {
       console.error("Error submitting deposit:", error);
       toast({
         title: "Error",
-        description: "Failed to create Paidly Interactive deposit request. Please try again.",
+        description: "Failed to create deposit request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -164,26 +122,37 @@ export const DepositForm = () => {
     }
   };
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(paymentAddress);
-      setCopied(true);
+  const handleStripePayment = async () => {
+    if (!clientSecret) return;
+
+    const stripe = await stripePromise;
+    if (!stripe) {
       toast({
-        title: "Copied!",
-        description: "Payment address copied to clipboard.",
+        title: "Error",
+        description: "Stripe failed to load. Please refresh and try again.",
+        variant: "destructive",
       });
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error('Failed to copy:', error);
+      return;
+    }
+
+    // Redirect to Stripe Checkout
+    const { error } = await stripe.redirectToCheckout({
+      sessionId: clientSecret.split('_secret_')[0] // Extract session ID from client secret
+    });
+
+    if (error) {
+      console.error('Stripe checkout error:', error);
+      toast({
+        title: "Payment Error",
+        description: error.message || "Failed to redirect to payment. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
   const resetForm = () => {
     setShowPayment(false);
-    setQrCodeUrl('');
-    setPaymentAddress('');
-    setPaymentLink('');
-    setPaymentAddressId('');
+    setClientSecret('');
     setPaymentAmount(0);
     form.reset();
   };
@@ -208,7 +177,7 @@ export const DepositForm = () => {
             <DialogHeader>
               <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Make a Deposit</DialogTitle>
               <DialogDescription className="text-center text-sm sm:text-base">
-                Enter your details to make a deposit. All fields are required.
+                Enter your details to make a secure deposit via Stripe. All fields are required.
               </DialogDescription>
             </DialogHeader>
             
@@ -327,36 +296,22 @@ export const DepositForm = () => {
                   )}
                 />
                 
-                <div className="space-y-2">
-                  <FormLabel className="text-sm sm:text-base">Payment Method</FormLabel>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                    <Button
-                      type="button"
-                      variant={paymentMethod === 'bitcoin' ? 'default' : 'outline'}
-                      onClick={() => setPaymentMethod('bitcoin')}
-                      className="flex items-center gap-2 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
-                    >
-                      <Bitcoin className="w-4 h-4" />
-                      Bitcoin
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={paymentMethod === 'lightning' ? 'default' : 'outline'}
-                      onClick={() => setPaymentMethod('lightning')}
-                      className="flex items-center gap-2 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
-                    >
-                      <Zap className="w-4 h-4" />
-                      Lightning
-                    </Button>
-                  </div>
-                </div>
-                
                 <Button 
                   type="submit" 
                   className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 touch-manipulation" 
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Processing..." : "Make a Deposit"}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Continue to Payment
+                    </>
+                  )}
                 </Button>
               </form>
             </Form>
@@ -365,79 +320,43 @@ export const DepositForm = () => {
           <>
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-2xl text-center text-casino-gold">
-                Paidly Interactive Payment - {paymentMethod === 'bitcoin' ? 'Bitcoin' : 'Lightning'}
+                Secure Payment
               </DialogTitle>
               <DialogDescription className="text-center text-sm sm:text-base">
-                Scan the QR code with your wallet or use the Paidly Interactive payment link
+                Complete your ${paymentAmount.toFixed(2)} deposit using Stripe's secure payment system
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">
-              {/* QR Code */}
-              <div className="flex justify-center">
-                <div className="p-2 sm:p-4 bg-white rounded-lg">
-                  {qrCodeUrl && (
-                    <img 
-                      src={qrCodeUrl} 
-                      alt="Payment QR Code" 
-                      className="w-48 h-48 sm:w-64 sm:h-64"
-                    />
-                  )}
-                </div>
+              {/* Payment Amount Display */}
+              <div className="text-center p-4 bg-muted rounded-lg">
+                <p className="text-2xl font-bold text-casino-gold">
+                  ${paymentAmount.toFixed(2)}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Secure payment powered by Stripe
+                </p>
               </div>
               
-              {/* Payment Details */}
-              <div className="space-y-3">
-                <div className="text-center">
-                  <p className="text-lg font-semibold text-casino-gold">
-                    Amount: ${paymentAmount.toFixed(2)}
-                  </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    Paidly Interactive {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
-                  </p>
-                </div>
-                
-                {/* Payment Link Button */}
-                <div className="space-y-2">
-                  <Button
-                    onClick={() => window.open(paymentLink, '_blank')}
-                    className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white touch-manipulation"
-                    size="lg"
-                  >
-                    Pay with Paidly Interactive →
-                  </Button>
-                </div>
-                
-                {/* Address */}
-                <div className="space-y-2">
-                  <label className="text-xs sm:text-sm font-medium">Paidly Interactive Payment Address:</label>
-                  <div className="flex items-center space-x-2">
-                    <Input 
-                      value={paymentAddress} 
-                      readOnly 
-                      className="text-xs sm:text-sm h-9 sm:h-10"
-                    />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={copyToClipboard}
-                      className="shrink-0 h-9 sm:h-10 px-2 sm:px-3 touch-manipulation"
-                    >
-                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              {/* Stripe Payment Button */}
+              <Button
+                onClick={handleStripePayment}
+                className="w-full h-12 text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white touch-manipulation"
+                size="lg"
+              >
+                <CreditCard className="w-5 h-5 mr-2" />
+                Pay with Stripe
+              </Button>
               
-              {/* Instructions */}
+              {/* Security Information */}
               <div className="bg-muted p-3 sm:p-4 rounded-lg">
-                <h4 className="text-sm sm:text-base font-medium mb-2">Paidly Interactive Payment Instructions:</h4>
-                <ol className="text-xs sm:text-sm space-y-1 list-decimal list-inside">
-                  <li>Open your Bitcoin wallet app</li>
-                  <li>Scan the QR code above or copy the Paidly Interactive address</li>
-                  <li>Send exactly ${paymentAmount.toFixed(2)} worth of Bitcoin</li>
-                  <li>Paidly Interactive will process and your deposit will be credited automatically</li>
-                </ol>
+                <h4 className="text-sm sm:text-base font-medium mb-2">Secure Payment Information:</h4>
+                <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside">
+                  <li>Your payment is processed securely by Stripe</li>
+                  <li>We never store your credit card information</li>
+                  <li>All transactions are encrypted and PCI compliant</li>
+                  <li>You'll receive an email confirmation after payment</li>
+                </ul>
               </div>
               
               <Button 

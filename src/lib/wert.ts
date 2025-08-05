@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-// Crypto purchase utilities for Shawn Sweepstakes
+// Payment utilities for Shawn Sweepstakes
 export const createPayment = async (paymentData: {
   amount: number;
   currency: string;

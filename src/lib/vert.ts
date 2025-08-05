@@ -1,4 +1,4 @@
-// Vert payment utilities
+// Vert payment utilities for Shawn Sweepstakes
 export const createVertPayment = async (paymentData: {
   amount: number;
   currency: string;
@@ -11,9 +11,13 @@ export const createVertPayment = async (paymentData: {
   };
 }) => {
   try {
-    const response = await fetch('/api/create-vert-payment', {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    const response = await fetch(`${supabaseUrl}/functions/v1/create-vert-payment`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(paymentData),

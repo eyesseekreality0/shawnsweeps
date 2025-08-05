@@ -70,7 +70,7 @@ export const DepositForm = () => {
       console.log('Deposit created successfully:', depositData);
 
       // Create Vert payment session
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, ''); // Remove trailing slash
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.replace(/\/$/, '');
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
       
       if (!supabaseUrl || !supabaseAnonKey) {
@@ -84,91 +84,53 @@ export const DepositForm = () => {
       const apiUrl = `${supabaseUrl}/functions/v1/create-vert-payment`;
       console.log('Calling Vert API at:', apiUrl);
       
-      let vertResponse;
-      try {
-        vertResponse = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseAnonKey}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            amount: parseFloat(data.amount),
-            currency: 'USD',
-            customerEmail: data.email,
-            description: `Shawn Sweepstakes deposit for ${data.gameName}`,
-            metadata: {
-              depositId: depositData.id,
-              username: data.username,
-              gameName: data.gameName
-            }
-          })
-        });
-      } catch (fetchError) {
-        console.error('Network error calling Supabase function:', fetchError);
-        throw new Error('Network connection failed. Please check your internet connection and try again.');
-      }
+      const vertResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: parseFloat(data.amount),
+          currency: 'USD',
+          customerEmail: data.email,
+          description: `Shawn Sweepstakes - ${data.gameName} deposit`,
+          metadata: {
+            depositId: depositData.id,
+            username: data.username,
+            gameName: data.gameName
+          }
+        })
+      });
 
       console.log('Vert response status:', vertResponse.status);
-      console.log('Vert response headers:', Object.fromEntries(vertResponse.headers.entries()));
       
       if (!vertResponse.ok) {
-        let errorText;
-        try {
-          errorText = await vertResponse.text();
-          console.error('Error response body:', errorText);
-        } catch (e) {
-          errorText = `HTTP ${vertResponse.status} ${vertResponse.statusText}`;
-        }
-        
-        // Handle specific error cases
-        if (vertResponse.status === 404) {
-          throw new Error('Payment service endpoint not found. Please contact support.');
-        } else if (vertResponse.status === 401 || vertResponse.status === 403) {
-          throw new Error('Payment service authentication failed. Please contact support.');
-        } else if (vertResponse.status >= 500) {
-          throw new Error('Payment service is temporarily unavailable. Please try again in a few minutes.');
-        } else {
-          throw new Error(`Payment creation failed (${vertResponse.status}): ${errorText}`);
-        }
+        const errorText = await vertResponse.text();
+        console.error('Vert API error response:', errorText);
+        throw new Error(`Payment service error (${vertResponse.status}): ${errorText}`);
       }
 
-      let vertData;
-      try {
-        vertData = await vertResponse.json();
-        console.log('Parsed Vert response:', vertData);
-      } catch (parseError) {
-        console.error('Error parsing Vert response:', parseError);
-        const responseText = await vertResponse.text();
-        console.error('Raw response:', responseText);
-        throw new Error('Invalid response from payment system. Please try again.');
-      }
-      
+      const vertData = await vertResponse.json();
+      console.log('Vert payment response:', vertData);
 
       if (!vertData.success) {
-        console.error('Error creating Vert payment:', vertData);
-        toast({
-          title: "Payment Setup Error", 
-          description: vertData?.error || vertData?.message || "Failed to create payment session. Please try again.",
-          variant: "destructive",
-        });
-        return;
+        throw new Error(vertData.error || 'Failed to create Vert payment session');
       }
 
       // Redirect to Vert payment page
-      const paymentUrl = vertData.paymentUrl || vertData.payment_url || vertData.url;
+      const paymentUrl = vertData.paymentUrl;
       if (paymentUrl) {
         console.log('Redirecting to payment URL:', paymentUrl);
         window.open(paymentUrl, '_blank', 'noopener,noreferrer');
       } else {
-        console.error('No payment URL found in response:', vertData);
-        throw new Error('No payment URL received from Vert');
+        throw new Error('No payment URL received from Vert payment system');
       }
 
       toast({
-        title: "Payment Session Created",
-        description: "You've been redirected to complete your secure payment.",
+        title: "Redirecting to Payment",
+        description: "Opening secure Vert payment page...",
       });
 
       // Close the dialog and reset form
@@ -178,23 +140,13 @@ export const DepositForm = () => {
     } catch (error) {
       console.error("Error submitting deposit:", error);
       
-      // Provide more specific error messages
-      let errorMessage = "Failed to create deposit request. Please try again.";
-      
-      if (error.message.includes('Network connection failed')) {
-        errorMessage = "Network error. Please check your internet connection and try again.";
-      } else if (error.message.includes('Payment service')) {
-        errorMessage = error.message;
-      } else if (error.message.includes('CORS')) {
-        errorMessage = "Connection error. Please try again in a moment.";
-      } else if (error.message.includes('configuration missing')) {
-        errorMessage = "System configuration error. Please contact support.";
-      } else if (error.message) {
+      let errorMessage = "Failed to process deposit. Please try again.";
+      if (error.message) {
         errorMessage = error.message;
       }
       
       toast({
-        title: "Error",
+        title: "Deposit Error",
         description: errorMessage,
         variant: "destructive",
       });
@@ -210,14 +162,14 @@ export const DepositForm = () => {
           size="lg" 
           className="text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation"
         >
-          Make a Deposit 💰
+          💳 Make Vert Deposit
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Make a Deposit</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Vert Payment Deposit</DialogTitle>
           <DialogDescription className="text-center text-sm sm:text-base">
-            Enter your details to make a secure deposit. All fields are required.
+            Secure deposit via Vert payment system. All fields are required.
           </DialogDescription>
         </DialogHeader>
         
@@ -340,30 +292,30 @@ export const DepositForm = () => {
             <div className="bg-muted p-3 sm:p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <Shield className="w-4 h-4 mr-2 text-green-600" />
-                <h4 className="text-sm sm:text-base font-medium">Secure Payment Information:</h4>
+                <h4 className="text-sm sm:text-base font-medium">Vert Secure Payment:</h4>
               </div>
               <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
-                <li>Your payment is processed securely</li>
-                <li>We never store your payment information</li>
-                <li>All transactions are encrypted and secure</li>
-                <li>You'll receive an email confirmation after payment</li>
+                <li>Powered by Vert secure payment system</li>
+                <li>Bank-level encryption and security</li>
+                <li>No payment details stored on our servers</li>
+                <li>Instant deposit processing</li>
               </ul>
             </div>
             
             <Button 
               type="submit" 
-              className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white border border-green-500/30 touch-manipulation" 
+              className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white border border-blue-500/30 touch-manipulation" 
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processing...
+                  Creating Vert Payment...
                 </>
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Continue to Secure Payment
+                  Continue to Vert Payment
                 </>
               )}
             </Button>

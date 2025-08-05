@@ -26,55 +26,21 @@ Deno.serve(async (req) => {
 
   try {
     console.log('=== Vert Payment Function Started ===')
-    console.log('Request method:', req.method)
-    console.log('Request headers:', Object.fromEntries(req.headers.entries()))
-
-    // Parse request body with error handling
-    let requestData: VertPaymentRequest
-    try {
-      const bodyText = await req.text()
-      console.log('Raw request body:', bodyText)
-      requestData = JSON.parse(bodyText)
-    } catch (parseError) {
-      console.error('Error parsing request body:', parseError)
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Invalid request format. Please check your data and try again.' 
-        }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
+    
+    // Parse request body
+    const requestData: VertPaymentRequest = await req.json()
     const { amount, currency, customerEmail, description, metadata } = requestData
 
     console.log('Creating Vert payment with data:', { amount, currency, customerEmail, description, metadata })
 
-    // Your actual Vert API credentials
+    // Vert API credentials
     const vertApiKey = '776572742d70726f642d33343733656162352d653566312d343363352d626535312d616531336165643361643539'
     const vertPartnerId = '01K1T8VJJ8TY67M49FDXY865GF'
     
-    if (!vertApiKey || !vertPartnerId) {
-      console.error('Vert API credentials not configured')
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Payment system configuration missing. Please contact support.' 
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    // Create Vert payment session with correct format
+    // Create Vert payment session
     const vertPayload = {
       partner_id: vertPartnerId,
-      amount: Math.round(amount * 100), // Convert to cents for Vert
+      amount: Math.round(amount * 100), // Convert to cents
       currency: currency.toUpperCase(),
       customer_email: customerEmail,
       description: description,
@@ -83,87 +49,62 @@ Deno.serve(async (req) => {
         username: metadata.username,
         game_name: metadata.gameName,
       },
-      success_url: `${req.headers.get('origin') || 'https://vbeirjdjfvmtwkljscwb.supabase.co'}/?payment=success`,
-      cancel_url: `${req.headers.get('origin') || 'https://vbeirjdjfvmtwkljscwb.supabase.co'}/?payment=cancelled`,
+      return_url: `${req.headers.get('origin') || 'https://vbeirjdjfvmtwkljscwb.supabase.co'}/?payment=success`,
     }
 
     console.log('Sending request to Vert API with payload:', vertPayload)
 
-    // Try multiple possible Vert API endpoints
-    const possibleEndpoints = [
-      'https://api.vert.co/v1/payment-sessions',
-      'https://api.vert.co/payment-sessions',
-      'https://vert.co/api/v1/payment-sessions',
-      'https://checkout.vert.co/api/v1/payment-sessions'
-    ]
+    const vertResponse = await fetch('https://api.vert.co/v1/payment-sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${vertApiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(vertPayload)
+    })
 
-    let vertResponse
-    let vertData
-    let lastError
+    console.log('Vert API response status:', vertResponse.status)
+    
+    const responseText = await vertResponse.text()
+    console.log('Vert API response body:', responseText)
 
-    for (const endpoint of possibleEndpoints) {
-      try {
-        console.log(`Trying Vert API endpoint: ${endpoint}`)
-        
-        vertResponse = await fetch(endpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${vertApiKey}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'Shawn-Sweepstakes/1.0',
-          },
-          body: JSON.stringify(vertPayload)
-        })
-
-        console.log(`Response from ${endpoint}:`, vertResponse.status, vertResponse.statusText)
-        
-        const responseText = await vertResponse.text()
-        console.log(`Response body from ${endpoint}:`, responseText)
-
-        if (vertResponse.ok) {
-          try {
-            vertData = JSON.parse(responseText)
-            console.log('Successfully parsed Vert response:', vertData)
-            break // Success, exit the loop
-          } catch (parseError) {
-            console.error(`Error parsing response from ${endpoint}:`, parseError)
-            lastError = new Error(`Invalid JSON response from ${endpoint}`)
-            continue
-          }
-        } else {
-          lastError = new Error(`HTTP ${vertResponse.status} from ${endpoint}: ${responseText}`)
-          continue
-        }
-      } catch (fetchError) {
-        console.error(`Network error with ${endpoint}:`, fetchError)
-        lastError = fetchError
-        continue
-      }
-    }
-
-    // If we didn't get a successful response from any endpoint
-    if (!vertData) {
-      console.error('All Vert API endpoints failed. Last error:', lastError)
+    if (!vertResponse.ok) {
+      console.error('Vert API error:', vertResponse.status, responseText)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Payment system unavailable. Error: ${lastError?.message || 'Unknown error'}`,
-          details: {
-            lastError: lastError?.message,
-            endpoints: possibleEndpoints
-          }
+          error: `Vert API error (${vertResponse.status}): ${responseText}`,
+          details: { status: vertResponse.status, body: responseText }
         }),
         { 
-          status: 503, 
+          status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
       )
     }
 
-    console.log('Vert payment session created successfully:', vertData)
+    let vertData
+    try {
+      vertData = JSON.parse(responseText)
+    } catch (parseError) {
+      console.error('Error parsing Vert response:', parseError)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid response from Vert API',
+          details: { responseText }
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
 
-    // Update the deposit record with the payment session ID
+    console.log('Vert payment session created:', vertData)
+
+    // Update deposit record with Vert payment ID
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -181,23 +122,21 @@ Deno.serve(async (req) => {
 
       if (updateError) {
         console.error('Error updating deposit:', updateError)
-        // Don't fail the entire request if database update fails
       }
     }
 
-    // Extract payment URL from various possible response formats
+    // Get payment URL
     const paymentUrl = vertData.payment_url || 
                       vertData.checkout_url || 
                       vertData.url || 
-                      vertData.redirect_url ||
-                      vertData.hosted_url
+                      vertData.redirect_url
 
     if (!paymentUrl) {
       console.error('No payment URL in Vert response:', vertData)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Payment URL not provided by payment system. Please try again.',
+          error: 'No payment URL received from Vert',
           vertResponse: vertData
         }),
         { 
@@ -213,8 +152,7 @@ Deno.serve(async (req) => {
         paymentUrl: paymentUrl,
         paymentId: paymentId,
         amount: amount,
-        currency: currency,
-        session: vertData
+        currency: currency
       }),
       { 
         status: 200, 
@@ -224,19 +162,13 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('=== Vert Payment Function Error ===')
-    console.error('Error type:', error.constructor.name)
-    console.error('Error message:', error.message)
-    console.error('Error stack:', error.stack)
+    console.error('Error:', error)
     
     return new Response(
       JSON.stringify({ 
         success: false, 
         error: `Server error: ${error.message}`,
-        type: 'server_error',
-        details: {
-          errorType: error.constructor.name,
-          errorMessage: error.message
-        }
+        type: 'server_error'
       }),
       { 
         status: 500, 

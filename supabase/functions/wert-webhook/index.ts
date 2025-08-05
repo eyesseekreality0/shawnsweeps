@@ -96,15 +96,15 @@ Deno.serve(async (req) => {
 
     // Handle different Wert webhook event types
     const eventType = event.type || event.event_type
-    const eventData = event.data || event
+    const eventData = event.order || event.data || event
     
     console.log('Processing event type:', eventType)
     console.log('Event data:', JSON.stringify(eventData, null, 2))
 
     // Extract order information
-    const orderId = eventData.id || eventData.order_id
+    const orderId = eventData.id || event.order?.id || eventData.order_id
     const clickId = eventData.click_id || eventData.external_id
-    const status = eventData.status
+    const status = eventData.status || event.status
     
     console.log('Order ID:', orderId)
     console.log('Click ID (Deposit ID):', clickId)
@@ -114,6 +114,10 @@ Deno.serve(async (req) => {
     let newStatus = 'pending'
     
     switch (eventType) {
+      case 'test':
+        newStatus = 'pending' // Test webhooks don't change status
+        console.log('Test webhook received - no status change')
+        break
       case 'order_processed':
       case 'order_completed':
       case 'payment_completed':

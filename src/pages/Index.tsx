@@ -27,16 +27,9 @@ const Index = () => {
         {/* Logo Section */}
         <section className="text-center py-2 sm:py-3 px-4">
           <img 
-            src="https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=400&h=200&fit=crop" 
-            alt="Shawn Sweeps Logo" 
+            src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" 
+            alt="Shawn Sweepstakes Logo" 
             className="mx-auto max-w-[280px] sm:max-w-xs md:max-w-sm w-full h-auto"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              const fallback = document.createElement('div');
-              fallback.className = 'mx-auto max-w-[280px] sm:max-w-xs md:max-w-sm w-full h-auto text-center py-8';
-              fallback.innerHTML = '<h1 class="text-3xl md:text-5xl font-bold text-casino-gold">SHAWN SWEEPS</h1>';
-              e.currentTarget.parentNode?.appendChild(fallback);
-            }}
           />
         </section>
 
@@ -62,12 +55,9 @@ const Index = () => {
         {/* Promotional Banner */}
         <section className="text-center py-2 sm:py-3 px-4">
           <img 
-            src="https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=800&h=400&fit=crop" 
+            src="https://shawn-sweepstakes.carrd.co/assets/images/image02.png?v=0c91e9dc" 
             alt="Special Promotion" 
             className="mx-auto max-w-sm sm:max-w-xl lg:max-w-2xl w-full h-auto rounded-lg shadow-lg"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
           />
         </section>
 

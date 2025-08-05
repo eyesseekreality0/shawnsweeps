@@ -5,7 +5,7 @@ export const CasinoBackground = () => {
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop')"
+          backgroundImage: "url('/lovable-uploads/0a72a758-c5cd-4fee-a196-97a26fc87cde.png')"
         }}
       />
       {/* Dark overlay for better text readability */}

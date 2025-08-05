@@ -22,22 +22,15 @@ export const Header = () => {
       <div className="relative z-10 text-center max-w-4xl mx-auto">
         <div className="flex items-center justify-center mb-4">
           <img 
-            src="https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop" 
-            alt="Shawn Sweeps Logo" 
+            src="/lovable-uploads/fe59b40d-e5fd-4762-858c-1276be42711b.png" 
+            alt="Shawn Sweepstakes Logo" 
             className="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-red-glow animate-glow object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              const fallback = document.createElement('div');
-              fallback.className = 'w-24 h-24 md:w-32 md:h-32 rounded-full shadow-red-glow animate-glow bg-gradient-primary flex items-center justify-center';
-              fallback.innerHTML = '<span class="text-casino-gold font-bold text-lg md:text-xl">SS</span>';
-              e.currentTarget.parentNode?.appendChild(fallback);
-            }}
           />
         </div>
         
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-3 tracking-wider">
           <span className="text-casino-gold">
-            SHAWN SWEEPS
+            SHAWN SWEEPSTAKES
           </span>
         </h1>
       </div>

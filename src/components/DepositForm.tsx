@@ -139,9 +139,9 @@ export const DepositForm = () => {
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Wert.io Payment Deposit</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Secure Crypto Deposit</DialogTitle>
           <DialogDescription className="text-center text-sm sm:text-base">
-            Secure deposit via Wert.io payment system. All fields are required.
+            Secure deposit via Wert.io - Buy crypto with your card and deposit instantly. All fields are required.
           </DialogDescription>
         </DialogHeader>
         
@@ -264,12 +264,12 @@ export const DepositForm = () => {
             <div className="bg-muted p-3 sm:p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <Shield className="w-4 h-4 mr-2 text-green-600" />
-                <h4 className="text-sm sm:text-base font-medium">Wert.io Secure Payment:</h4>
+                <h4 className="text-sm sm:text-base font-medium">Wert.io Secure Crypto Purchase:</h4>
               </div>
               <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
-                <li>Powered by Wert.io secure payment system</li>
+                <li>Buy crypto instantly with your debit/credit card</li>
                 <li>Bank-level encryption and security</li>
-                <li>No payment details stored on our servers</li>
+                <li>KYC/AML compliant and regulated</li>
                 <li>Instant deposit processing</li>
               </ul>
             </div>
@@ -282,12 +282,12 @@ export const DepositForm = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating Wert.io Payment...
+                  Creating Crypto Purchase...
                 </>
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Continue to Wert.io Payment
+                  Buy Crypto & Deposit
                 </>
               )}
             </Button>

@@ -50,34 +50,21 @@ Deno.serve(async (req) => {
 
     console.log('Creating Wert payment with data:', { amount, currency, customerEmail, description, metadata })
 
-    // Wert.io API credentials from environment
-    const wertApiKey = Deno.env.get('WERT_API_KEY')
-    const wertPartnerId = Deno.env.get('WERT_PARTNER_ID')
+    // Wert.io sandbox credentials
+    const wertApiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
+    const wertPartnerId = '01K0FHM9K6ATK1CYCHMV34Z0YG'
     
-    if (!wertApiKey || !wertPartnerId) {
-      console.error('Missing Wert.io credentials')
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Wert.io credentials not configured',
-          type: 'config_error'
-        }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
+    console.log('Using Wert.io sandbox credentials')
 
-    // Create Wert.io order payload
+    // Create Wert.io order payload for sandbox
     const wertPayload = {
       partner_id: wertPartnerId,
-      click_id: metadata.depositId, // Use deposit ID as click_id for tracking
-      origin: 'https://widget.wert.io',
-      commodity: 'USD',
-      commodity_amount: amount,
-      pk_id: 'key1',
-      sc_address: customerEmail, // Use email as smart contract address placeholder
+      click_id: metadata.depositId,
+      origin: 'https://sandbox.wert.io',
+      commodity: 'USDC',
+      commodity_amount: amount * 100, // Convert to cents
+      pk_id: 'key1', 
+      sc_address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI contract address for sandbox
       sc_input_data: JSON.stringify({
         username: metadata.username,
         game_name: metadata.gameName,
@@ -87,8 +74,8 @@ Deno.serve(async (req) => {
 
     console.log('Sending request to Wert.io API with payload:', wertPayload)
 
-    // Try Wert.io Data API endpoint
-    const wertResponse = await fetch('https://api.wert.io/v3/orders', {
+    // Use Wert.io sandbox API endpoint
+    const wertResponse = await fetch('https://sandbox-api.wert.io/v3/orders', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${wertApiKey}`,
@@ -168,7 +155,7 @@ Deno.serve(async (req) => {
                       wertData.payment_url || 
                       wertData.checkout_url || 
                       wertData.url ||
-                      `https://widget.wert.io/01DPAPQX2Q0MFWKMTQHP9WB4N7/widget?theme=dark&color_buttons=01D4AA&color_secondary=344152&color_main=FFFFFF&color_icons=01D4AA&commodity=USD&commodity_amount=${amount}&click_id=${metadata.depositId}`
+                      `https://sandbox-widget.wert.io/${wertPartnerId}/widget?theme=dark&color_buttons=01D4AA&color_secondary=344152&color_main=FFFFFF&color_icons=01D4AA&commodity=USDC&commodity_amount=${amount * 100}&click_id=${metadata.depositId}`
 
     if (!paymentUrl) {
       console.error('No payment URL in Wert.io response:', wertData)

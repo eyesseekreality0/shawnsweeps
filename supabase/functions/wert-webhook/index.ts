@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
     console.log('Body:', body)
 
     // Verify webhook signature
-    const webhookSecret = Deno.env.get('WERT_WEBHOOK_SECRET')
+    const webhookSecret = '0x57466afb5491ee372b3b30d82ef7e7a0583c9e36aef0f02435bd164fe172b1d3'
     if (webhookSecret && signature) {
       const expectedSignature = createHmac('sha256', webhookSecret)
         .update(body)

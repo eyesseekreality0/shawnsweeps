@@ -1,4 +1,4 @@
-// Wert.io payment utilities for Shawn Sweepstakes
+// Wert.io crypto purchase utilities for Shawn Sweepstakes
 export const createWertPayment = async (paymentData: {
   amount: number;
   currency: string;

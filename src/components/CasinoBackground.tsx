@@ -135,181 +135,181 @@ export const games: Game[] = [
   {
     id: "sincity",
     name: "Sin City",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/sin-city-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/sin-city-logo.png",
     gameUrl: "https://sincitysweeps.net/"
   },
   {
     id: "vegassweeps",
     name: "Vegas Sweeps",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/vegas-sweeps-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/vegas-sweeps-logo.png",
     gameUrl: "https://m.lasvegassweeps.com/"
   },
   {
     id: "ignite",
     name: "IGNITE",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/ignite-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/ignite-logo.png",
     gameUrl: "https://casinoignite.vip/"
   },
   {
     id: "cashfrenzy",
     name: "Cashapp Frenzy",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/cashapp-frenzy-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/cashapp-frenzy-logo.png",
     gameUrl: "https://www.cashfrenzy777.com/"
   },
   {
     id: "acebook",
     name: "ACEBOOK",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/acebook-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/acebook-logo.png",
     gameUrl: "https://www.playacebook.mobi/"
   },
   {
     id: "bluedragon2",
     name: "Blue Dragon 2",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/blue-dragon-2-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/blue-dragon-2-logo.png",
     gameUrl: "http://app.getbluedragon.com/"
   },
   {
     id: "juwa777",
     name: "Juwa777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/juwa777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/juwa777-logo.png",
     gameUrl: "https://dl.juwa777.com/"
   },
   {
     id: "pandamaster",
     name: "Panda Master",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/panda-master-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/panda-master-logo.png",
     gameUrl: "https://pandamaster.vip:8888/index.html"
   },
   {
     id: "fishglory",
     name: "Fish Glory",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/fish-glory-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/fish-glory-logo.png",
     gameUrl: "https://www.fishglory.games/"
   },
   {
     id: "vegasroll",
     name: "Vegas Roll",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/vegas-roll-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/vegas-roll-logo.png",
     gameUrl: "http://www.vegas-roll.com/m"
   },
   {
     id: "mrallinone",
     name: "Mr All In One",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/mr-all-in-one-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/mr-all-in-one-logo.png",
     gameUrl: "https://www.mrallinone777.com/m"
   },
   {
     id: "orionpower",
     name: "ORION Power",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/orion-power-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/orion-power-logo.png",
     gameUrl: "http://product.orionpower.games/v1001/"
   },
   {
     id: "quakegame",
     name: "Quake Game",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/quake-game-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/quake-game-logo.png",
     gameUrl: "https://www.quakegame.net/"
   },
   {
     id: "vegasluck777",
     name: "Vegas Luck 777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/vegas-luck-777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/vegas-luck-777-logo.png",
     gameUrl: "https://start.vegasluck777.com/"
   },
   {
     id: "noble777",
     name: "Noble 777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/noble-777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/noble-777-logo.png",
     gameUrl: "https://www.noble777.com/m"
   },
   {
     id: "cashmachine777",
     name: "Cash Machine 777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/cash-machine-777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/cash-machine-777-logo.png",
     gameUrl: "https://www.cashmachine777.com/m"
   },
   {
     id: "gameroom777",
     name: "Game Room 777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/game-room-777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/game-room-777-logo.png",
     gameUrl: "https://www.gameroom777.com/m"
   },
   {
     id: "luckystars",
     name: "Lucky Stars",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/lucky-stars-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/lucky-stars-logo.png",
     gameUrl: "http://www.luckystars.games/m"
   },
   {
     id: "slots88888",
     name: "Slots 88888",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/slots-88888-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/slots-88888-logo.png",
     gameUrl: "https://www.slots88888.com/m"
   },
   {
     id: "winstar99999",
     name: "Win Star 99999",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/win-star-99999-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/win-star-99999-logo.png",
     gameUrl: "http://server.winstar99999.com:8009/m"
   },
   {
     id: "mafia77777",
     name: "Mafia 77777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/mafia-77777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/mafia-77777-logo.png",
     gameUrl: "http://product.mafia77777.com/v1003/"
   },
   {
     id: "yolo777",
     name: "YOLO 777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/yolo-777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/yolo-777-logo.png",
     gameUrl: "https://yolo777.game/"
   },
   {
     id: "fpc",
     name: "FPC Mobile",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/fpc-mobile-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/fpc-mobile-logo.png",
     gameUrl: "https://fpc-mob.com/AD/index.html"
   },
   {
     id: "winnersclub777",
     name: "Winners Club 777",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/winners-club-777-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/winners-club-777-logo.png",
     gameUrl: "https://www.winnersclub777.com/"
   },
   {
     id: "legendfire",
     name: "Legend Fire",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/legend-fire-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/legend-fire-logo.png",
     gameUrl: "https://www.legendfire.xyz/"
   },
   {
     id: "firelinkplus",
     name: "Fire Link Plus",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/fire-link-plus-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/fire-link-plus-logo.png",
     gameUrl: "https://firelinkplus.com/"
   },
   {
     id: "blackmamba",
     name: "Black Mamba",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/black-mamba-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/black-mamba-logo.png",
     gameUrl: "https://blackmamba.mobi/"
   },
   {
     id: "playorca",
     name: "Play Orca",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/play-orca-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/play-orca-logo.png",
     gameUrl: "https://playorca.mobi/"
   },
   {
     id: "playbdd",
     name: "Play BDD",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/play-bdd-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/play-bdd-logo.png",
     gameUrl: "https://www.playbdd.com/"
   },
   {
     id: "kraken",
     name: "The Kraken",
-    imageUrl: "https://sweepshub.com/wp-content/uploads/2024/01/the-kraken-logo.png",
+    imageUrl: "https://sweepshub.us/wp-content/uploads/2024/01/the-kraken-logo.png",
     gameUrl: "https://getthekraken.com/"
   }
 ];

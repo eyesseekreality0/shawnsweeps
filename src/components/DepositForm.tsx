@@ -79,11 +79,15 @@ export const DepositForm = () => {
 
       console.log('Creating Vert payment for deposit:', depositData.id);
 
-      const vertResponse = await fetch(`${supabaseUrl}/functions/v1/create-vert-payment`, {
+      const apiUrl = `${supabaseUrl}/functions/v1/create-vert-payment`;
+      console.log('Calling Vert API at:', apiUrl);
+      
+      const vertResponse = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${supabaseAnonKey}`,
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           amount: parseFloat(data.amount),
@@ -99,14 +103,29 @@ export const DepositForm = () => {
       });
 
       console.log('Vert response status:', vertResponse.status);
+      console.log('Vert response headers:', Object.fromEntries(vertResponse.headers.entries()));
       
       if (!vertResponse.ok) {
-        const errorText = await vertResponse.text();
+        let errorText;
+        try {
+          errorText = await vertResponse.text();
+        } catch (e) {
+          errorText = `HTTP ${vertResponse.status} ${vertResponse.statusText}`;
+        }
         console.error('Vert payment creation failed:', errorText);
-        throw new Error(`Payment creation failed: ${errorText}`);
+        throw new Error(`Payment creation failed (${vertResponse.status}): ${errorText}`);
       }
 
-      const vertData = await vertResponse.json();
+      let vertData;
+      try {
+        vertData = await vertResponse.json();
+      } catch (parseError) {
+        console.error('Error parsing Vert response:', parseError);
+        const responseText = await vertResponse.text();
+        console.error('Raw response:', responseText);
+        throw new Error('Invalid response from payment system. Please try again.');
+      }
+      
       console.log('Vert payment response:', vertData);
 
       if (!vertData.success) {
@@ -138,9 +157,21 @@ export const DepositForm = () => {
 
     } catch (error) {
       console.error("Error submitting deposit:", error);
+      
+      // Provide more specific error messages
+      let errorMessage = "Failed to create deposit request. Please try again.";
+      
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = "Network error. Please check your internet connection and try again.";
+      } else if (error.message.includes('CORS')) {
+        errorMessage = "Connection error. Please try again in a moment.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to create deposit request. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

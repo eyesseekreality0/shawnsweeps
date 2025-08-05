@@ -2,7 +2,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, accept',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 }
 
@@ -64,17 +64,22 @@ Deno.serve(async (req) => {
 
     console.log('Sending request to Vert API with payload:', vertPayload)
 
-    const vertResponse = await fetch('https://api.vert.co/v1/payments', {
+    const vertApiUrl = 'https://api.vert.co/v1/payment-sessions';
+    console.log('Calling Vert API at:', vertApiUrl);
+    
+    const vertResponse = await fetch(vertApiUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${vertApiKey}`,
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify(vertPayload)
     })
 
     const vertData = await vertResponse.text()
     console.log('Vert API response status:', vertResponse.status)
+    console.log('Vert API response headers:', Object.fromEntries(vertResponse.headers.entries()))
     console.log('Vert API response body:', vertData)
 
     if (!vertResponse.ok) {
@@ -86,11 +91,12 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Payment system error: ${vertResponse.status}. Please try again or contact support.`,
+          error: `Payment system error (${vertResponse.status}): ${vertResponse.statusText}. Please try again or contact support.`,
           details: {
             status: vertResponse.status,
             statusText: vertResponse.statusText,
-            body: vertData
+            body: vertData,
+            url: vertApiUrl
           }
         }),
         { 
@@ -142,10 +148,11 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        paymentUrl: paymentSession.payment_url || paymentSession.url,
+        paymentUrl: paymentSession.payment_url || paymentSession.checkout_url || paymentSession.url,
         paymentId: paymentSession.id,
         amount: amount,
-        currency: currency
+        currency: currency,
+        session: paymentSession
       }),
       { 
         status: 200, 
@@ -155,10 +162,27 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Error creating Vert payment:', error)
+    
+    // Check if it's a network error
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Network connection error. Please check your internet connection and try again.',
+          type: 'network_error'
+        }),
+        { 
+          status: 503, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: `Internal server error: ${error.message}` 
+        error: `Internal server error: ${error.message}`,
+        type: 'server_error'
       }),
       { 
         status: 500, 

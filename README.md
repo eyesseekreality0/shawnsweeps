@@ -1,73 +1,100 @@
-# Welcome to your Lovable project
+# Shawn Sweeps - Premium Gaming Experience
 
-## Project info
+## Project Overview
 
-**URL**: https://lovable.dev/projects/f88f19d8-05ee-4a1a-9fa5-f49bb1af8908
+Shawn Sweeps is a premium sweepstakes gaming platform offering the finest selection of casino-style games. Built with modern web technologies for an exceptional user experience.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Premium Game Collection**: Access to 50+ popular sweepstakes games
+- **Mobile-Optimized**: Fully responsive design for all devices
+- **Secure Payments**: Bitcoin and Lightning Network payment integration via Paidly
+- **Real-time Updates**: Live payment status tracking
+- **Search & Filter**: Easy game discovery with search functionality
 
-**Use Lovable**
+## Technologies Used
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f88f19d8-05ee-4a1a-9fa5-f49bb1af8908) and start prompting.
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **UI Components**: shadcn/ui component library
+- **Backend**: Supabase (Database, Authentication, Edge Functions)
+- **Payments**: Paidly Interactive API
+- **Build Tool**: Vite
+- **Deployment**: Netlify
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js (v18 or higher)
+- npm or yarn package manager
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd shawn-sweeps
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies
+```bash
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. Set up environment variables
+```bash
+cp .env.example .env.local
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Start the development server
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Building for Production
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── components/          # Reusable UI components
+├── pages/              # Page components
+├── data/               # Game data and configurations
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+├── contexts/           # React contexts
+└── integrations/       # Third-party integrations
+```
 
-This project is built with:
+## Payment Integration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The platform uses Paidly Interactive for secure Bitcoin and Lightning Network payments:
 
-## How can I deploy this project?
+- **Bitcoin On-Chain**: Traditional Bitcoin transactions
+- **Lightning Network**: Fast, low-fee Bitcoin payments
+- **Real-time Status**: Automatic payment confirmation
+- **QR Code Support**: Easy mobile wallet integration
 
-Simply open [Lovable](https://lovable.dev/projects/f88f19d8-05ee-4a1a-9fa5-f49bb1af8908) and click on Share -> Publish.
+## Game Collection
 
-## Can I connect a custom domain to my Lovable project?
+Features popular sweepstakes games including:
+- Fire Kirin
+- Orion Stars
+- Golden Dragon
+- Ultra Panda
+- Vegas X
+- And many more...
 
-Yes, you can!
+## Support
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+For technical support or questions, please contact our development team.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## License
+
+This project is proprietary software. All rights reserved.

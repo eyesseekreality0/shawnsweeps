@@ -1,5 +1,5 @@
-// Wert.io crypto purchase utilities for Shawn Sweepstakes
-export const createWertPayment = async (paymentData: {
+// Crypto purchase utilities for Shawn Sweepstakes
+export const createPayment = async (paymentData: {
   amount: number;
   currency: string;
   customerEmail: string;
@@ -24,17 +24,17 @@ export const createWertPayment = async (paymentData: {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create Wert.io payment');
+      throw new Error('Failed to create payment');
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error creating Wert.io payment:', error);
+    console.error('Error creating payment:', error);
     throw error;
   }
 };
 
-export const redirectToWertPayment = (paymentUrl: string) => {
+export const redirectToPayment = (paymentUrl: string) => {
   window.open(paymentUrl, '_blank', 'noopener,noreferrer');
 };

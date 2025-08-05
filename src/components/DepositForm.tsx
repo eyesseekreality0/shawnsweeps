@@ -16,7 +16,7 @@ import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CreditCard, Loader2, Shield } from 'lucide-react';
-import { createWertPayment } from "@/lib/wert";
+import { createPayment } from "@/lib/wert";
 
 const depositSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -70,10 +70,10 @@ export const DepositForm = () => {
 
       console.log('Deposit created successfully:', depositData);
 
-      // Create Wert.io payment session
-      console.log('Creating Wert.io payment for deposit:', depositData.id);
+      // Create payment session
+      console.log('Creating payment for deposit:', depositData.id);
       
-      const wertResponse = await createWertPayment({
+      const paymentResponse = await createPayment({
         amount: parseFloat(data.amount),
         currency: 'USD',
         customerEmail: data.email,
@@ -85,24 +85,24 @@ export const DepositForm = () => {
         }
       });
 
-      console.log('Wert.io payment response:', wertResponse);
+      console.log('Payment response:', paymentResponse);
 
-      if (!wertResponse.success) {
-        throw new Error(wertResponse.error || 'Failed to create Wert.io payment session');
+      if (!paymentResponse.success) {
+        throw new Error(paymentResponse.error || 'Failed to create payment session');
       }
 
-      // Redirect to Wert.io payment page
-      const paymentUrl = wertResponse.paymentUrl;
+      // Redirect to payment page
+      const paymentUrl = paymentResponse.paymentUrl;
       if (paymentUrl) {
-        console.log('Redirecting to Wert.io payment URL:', paymentUrl);
+        console.log('Redirecting to payment URL:', paymentUrl);
         window.open(paymentUrl, '_blank', 'noopener,noreferrer');
       } else {
-        throw new Error('No payment URL received from Wert.io payment system');
+        throw new Error('No payment URL received from payment system');
       }
 
       toast({
-        title: "Redirecting to Payment",
-        description: "Opening secure Wert.io payment page...",
+        title: "Processing Deposit",
+        description: "Opening secure payment page...",
       });
 
       // Close the dialog and reset form
@@ -134,14 +134,14 @@ export const DepositForm = () => {
           size="lg" 
           className="text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-blue-900 to-blue-800 hover:from-blue-800 hover:to-blue-700 text-white border border-blue-500/30 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation"
         >
-          💳 Make Wert Deposit
+          💳 Make a Deposit
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Secure Crypto Deposit</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Secure Deposit</DialogTitle>
           <DialogDescription className="text-center text-sm sm:text-base">
-            Secure deposit via Wert.io - Buy crypto with your card and deposit instantly. All fields are required.
+            Secure deposit - Buy crypto with your card and deposit instantly. All fields are required.
           </DialogDescription>
         </DialogHeader>
         
@@ -264,7 +264,7 @@ export const DepositForm = () => {
             <div className="bg-muted p-3 sm:p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <Shield className="w-4 h-4 mr-2 text-green-600" />
-                <h4 className="text-sm sm:text-base font-medium">Wert.io Secure Crypto Purchase:</h4>
+                <h4 className="text-sm sm:text-base font-medium">Secure Crypto Purchase:</h4>
               </div>
               <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
                 <li>Buy crypto instantly with your debit/credit card</li>
@@ -282,12 +282,12 @@ export const DepositForm = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creating Crypto Purchase...
+                  Processing Deposit...
                 </>
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Buy Crypto & Deposit
+                  Make Deposit
                 </>
               )}
             </Button>

@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
     const body = await req.text()
     const signature = req.headers.get('wert-signature')
     
-    console.log('Wert.io webhook received')
+    console.log('Webhook received')
     console.log('Signature:', signature)
     console.log('Body:', body)
 
@@ -49,8 +49,8 @@ Deno.serve(async (req) => {
       return new Response('Invalid JSON', { status: 400 })
     }
 
-    console.log('Wert.io webhook event type:', event.type)
-    console.log('Wert.io webhook event data:', event.data)
+    console.log('Webhook event type:', event.type)
+    console.log('Webhook event data:', event.data)
 
     // Process the webhook based on event type
     if (event.type === 'order_processed' || event.type === 'order.completed') {
@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error processing Wert.io webhook:', error)
+    console.error('Error processing webhook:', error)
     return new Response(
       JSON.stringify({ 
         error: `Webhook processing error: ${error.message}` 

@@ -25,10 +25,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('=== Wert Payment Function Started ===')
+    console.log('=== Payment Function Started ===')
     
     // Parse request body with error handling
-    let requestData: WertPaymentRequest
+    let requestData
     try {
       requestData = await req.json()
     } catch (parseError) {
@@ -48,17 +48,17 @@ Deno.serve(async (req) => {
 
     const { amount, currency, customerEmail, description, metadata } = requestData
 
-    console.log('Creating Wert payment with data:', { amount, currency, customerEmail, description, metadata })
+    console.log('Creating payment with data:', { amount, currency, customerEmail, description, metadata })
 
-    // Wert.io sandbox credentials
-    const wertApiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
-    const wertPartnerId = '01K0FHM9K6ATK1CYCHMV34Z0YG'
+    // Sandbox credentials
+    const apiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
+    const partnerId = '01K0FHM9K6ATK1CYCHMV34Z0YG'
     
-    console.log('Using Wert.io sandbox credentials')
+    console.log('Using sandbox credentials')
 
-    // Create Wert.io order payload for sandbox
-    const wertPayload = {
-      partner_id: wertPartnerId,
+    // Create order payload for sandbox
+    const payload = {
+      partner_id: partnerId,
       click_id: metadata.depositId,
       origin: 'https://sandbox.wert.io',
       commodity: 'USDC',
@@ -72,31 +72,31 @@ Deno.serve(async (req) => {
       })
     }
 
-    console.log('Sending request to Wert.io API with payload:', wertPayload)
+    console.log('Sending request to API with payload:', payload)
 
-    // Use Wert.io sandbox API endpoint
-    const wertResponse = await fetch('https://sandbox-api.wert.io/v3/orders', {
+    // Use sandbox API endpoint
+    const response = await fetch('https://sandbox-api.wert.io/v3/orders', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${wertApiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify(wertPayload)
+      body: JSON.stringify(payload)
     })
 
-    console.log('Wert.io API response status:', wertResponse.status)
+    console.log('API response status:', response.status)
     
-    const responseText = await wertResponse.text()
-    console.log('Wert.io API response body:', responseText)
+    const responseText = await response.text()
+    console.log('API response body:', responseText)
 
-    if (!wertResponse.ok) {
-      console.error('Wert.io API error:', wertResponse.status, responseText)
+    if (!response.ok) {
+      console.error('API error:', response.status, responseText)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Wert.io API error (${wertResponse.status}): ${responseText}`,
-          details: { status: wertResponse.status, body: responseText },
+          error: `API error (${response.status}): ${responseText}`,
+          details: { status: response.status, body: responseText },
           type: 'api_error'
         }),
         { 
@@ -106,15 +106,15 @@ Deno.serve(async (req) => {
       )
     }
 
-    let wertData
+    let data
     try {
-      wertData = JSON.parse(responseText)
+      data = JSON.parse(responseText)
     } catch (parseError) {
-      console.error('Error parsing Wert.io response:', parseError)
+      console.error('Error parsing response:', parseError)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Invalid response from Wert.io API',
+          error: 'Invalid response from payment API',
           details: { responseText },
           type: 'parse_error'
         }),
@@ -125,15 +125,15 @@ Deno.serve(async (req) => {
       )
     }
 
-    console.log('Wert.io order created:', wertData)
+    console.log('Order created:', data)
 
-    // Update deposit record with Wert.io order ID
+    // Update deposit record with order ID
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const orderId = wertData.id || wertData.order_id
+    const orderId = data.id || data.order_id
     if (orderId) {
       const { error: updateError } = await supabase
         .from('deposits')
@@ -144,26 +144,26 @@ Deno.serve(async (req) => {
         .eq('id', metadata.depositId)
 
       if (updateError) {
-        console.error('Error updating deposit with Wert order ID:', updateError)
+        console.error('Error updating deposit with order ID:', updateError)
       } else {
-        console.log('Deposit updated with Wert order ID:', orderId)
+        console.log('Deposit updated with order ID:', orderId)
       }
     }
 
-    // Get payment URL from Wert.io response
-    const paymentUrl = wertData.redirect_url || 
-                      wertData.payment_url || 
-                      wertData.checkout_url || 
-                      wertData.url ||
-                      `https://sandbox-widget.wert.io/${wertPartnerId}/widget?theme=dark&color_buttons=01D4AA&color_secondary=344152&color_main=FFFFFF&color_icons=01D4AA&commodity=USDC&commodity_amount=${amount * 100}&click_id=${metadata.depositId}`
+    // Get payment URL from response
+    const paymentUrl = data.redirect_url || 
+                      data.payment_url || 
+                      data.checkout_url || 
+                      data.url ||
+                      `https://sandbox-widget.wert.io/${partnerId}/widget?theme=dark&color_buttons=01D4AA&color_secondary=344152&color_main=FFFFFF&color_icons=01D4AA&commodity=USDC&commodity_amount=${amount * 100}&click_id=${metadata.depositId}`
 
     if (!paymentUrl) {
-      console.error('No payment URL in Wert.io response:', wertData)
+      console.error('No payment URL in response:', data)
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'No payment URL received from Wert.io',
-          wertResponse: wertData,
+          error: 'No payment URL received from payment provider',
+          response: data,
           type: 'url_error'
         }),
         { 
@@ -188,7 +188,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('=== Wert Payment Function Error ===')
+    console.error('=== Payment Function Error ===')
     console.error('Error:', error)
     
     return new Response(

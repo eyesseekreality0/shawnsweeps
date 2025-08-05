@@ -56,7 +56,7 @@ export const DepositForm = () => {
 
   const generatePaymentQR = async (amount: number, method: 'bitcoin' | 'lightning', depositId: string, customerEmail: string, username: string, gameName: string) => {
     try {
-      // Create payment address via Paidly API
+      // Create payment address via Paidly Interactive API
       const { data: paidlyData, error: paidlyError } = await supabase.functions.invoke('create-paidly-checkout', {
         body: {
           amount: amount,
@@ -149,14 +149,14 @@ export const DepositForm = () => {
 
       toast({
         title: "Paidly Deposit Created",
-        description: "Scan the QR code below with your Bitcoin wallet to complete payment via Paidly.",
+        description: "Scan the QR code below with your Bitcoin wallet to complete payment via Paidly Interactive.",
       });
 
     } catch (error) {
       console.error("Error submitting deposit:", error);
       toast({
         title: "Error",
-        description: "Failed to submit deposit request. Please try again.",
+        description: "Failed to create Paidly deposit request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -336,10 +336,10 @@ export const DepositForm = () => {
           <>
             <DialogHeader>
               <DialogTitle className="text-2xl text-center text-casino-gold">
-                Paidly Payment - {paymentMethod === 'bitcoin' ? 'Bitcoin' : 'Lightning'}
+                Paidly Interactive Payment - {paymentMethod === 'bitcoin' ? 'Bitcoin' : 'Lightning'}
               </DialogTitle>
               <DialogDescription className="text-center">
-                Scan the QR code with your wallet or copy the Paidly payment address
+                Scan the QR code with your wallet or use the Paidly Interactive payment link
               </DialogDescription>
             </DialogHeader>
             
@@ -364,7 +364,7 @@ export const DepositForm = () => {
                     Amount: ${paymentAmount.toFixed(2)}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Paidly {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
+                    Paidly Interactive {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
                   </p>
                 </div>
                 
@@ -375,13 +375,13 @@ export const DepositForm = () => {
                     className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
                     size="lg"
                   >
-                    Pay with Paidly →
+                    Pay with Paidly Interactive →
                   </Button>
                 </div>
                 
                 {/* Address */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Paidly Payment Address:</label>
+                  <label className="text-sm font-medium">Paidly Interactive Payment Address:</label>
                   <div className="flex items-center space-x-2">
                     <Input 
                       value={paymentAddress} 
@@ -402,12 +402,12 @@ export const DepositForm = () => {
               
               {/* Instructions */}
               <div className="bg-muted p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Paidly Payment Instructions:</h4>
+                <h4 className="font-medium mb-2">Paidly Interactive Payment Instructions:</h4>
                 <ol className="text-sm space-y-1 list-decimal list-inside">
                   <li>Open your Bitcoin wallet app</li>
-                  <li>Scan the QR code above or copy the Paidly address</li>
+                  <li>Scan the QR code above or copy the Paidly Interactive address</li>
                   <li>Send exactly ${paymentAmount.toFixed(2)} worth of Bitcoin</li>
-                  <li>Paidly will process and your deposit will be credited automatically</li>
+                  <li>Paidly Interactive will process and your deposit will be credited automatically</li>
                 </ol>
               </div>
               

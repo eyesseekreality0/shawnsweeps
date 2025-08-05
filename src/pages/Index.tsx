@@ -1,3 +1,9 @@
+import React, { useState } from 'react';
+import { GameCard } from '../components/GameCard';
+import { GameSearch } from '../components/GameSearch';
+import { Header } from '../components/Header';
+import { CasinoBackground } from '../components/CasinoBackground';
+
 export interface Game {
   id: string;
   name: string;
@@ -313,3 +319,58 @@ export const games: Game[] = [
     gameUrl: "https://getthekraken.com/"
   }
 ];
+
+const Index: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredGames, setFilteredGames] = useState<Game[]>(games);
+
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
+    if (term.trim() === '') {
+      setFilteredGames(games);
+    } else {
+      const filtered = games.filter(game =>
+        game.name.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredGames(filtered);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative">
+      <CasinoBackground />
+      <div className="relative z-10">
+        <Header />
+        
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+              🎰 Shawn Sweepstakes 🎰
+            </h1>
+            <p className="text-xl text-gray-200 mb-6">
+              Your Gateway to Premium Sweepstakes Gaming
+            </p>
+          </div>
+
+          <GameSearch onSearch={handleSearch} />
+
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-4">
+            {filteredGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+
+          {filteredGames.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-300 text-lg">
+                No games found matching "{searchTerm}"
+              </p>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Index;

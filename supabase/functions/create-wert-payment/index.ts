@@ -36,19 +36,18 @@ Deno.serve(async (req) => {
     // Wert.io sandbox credentials
     const partnerId = '01K0FHM9K6ATK1CYCHMV34Z0YG'
     const privateKey = '0x57466afb5491ee372b3b30d82ef7e7a0583c9e36aef0f02435bd164fe172b1d3'
-    const apiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
     
-    // Create Wert order using their API
-    const orderData = {
+    // Widget parameters following Wert.io documentation
+    const widgetParams = {
       partner_id: partnerId,
       click_id: metadata.depositId,
       origin: 'https://shawn-sweepstakes.com',
       commodity: 'USDC',
       commodity_amount: amount,
       network: 'ethereum',
-      address: '0xA0b86a33E6441e6e80A7181a02F6109c4E8c1b8E', // USDC contract address
-      redirect_url: 'https://shawn-sweepstakes.com',
-      extra: {
+      address: '0xA0b86a33E6441e6e80A7181a02F6109c4E8c1b8E',
+      redirect_url: 'https://shawn-sweepstakes.com?payment=success',
+      extra: JSON.stringify({
         item_info: {
           author: 'Shawn Sweepstakes',
           name: `${metadata.gameName} Deposit`,
@@ -56,40 +55,19 @@ Deno.serve(async (req) => {
           seller: 'Shawn Sweepstakes',
           seller_id: 'shawn-sweepstakes'
         }
-      }
-    }
-    
-    // Wert widget configuration
-    const widgetData = {
-      partner_id: partnerId,
-      click_id: metadata.depositId,
-      origin: 'https://shawn-sweepstakes.com',
-      commodity: 'USDC',
-      commodity_amount: amount,
-      network: 'ethereum',
-      address: '0xA0b86a33E6441e6e80A7181a02F6109c4E8c1b8E', // USDC contract address
-      redirect_url: 'https://shawn-sweepstakes.com',
-      extra: {
-        item_info: {
-          author: 'Shawn Sweepstakes',
-          name: `${metadata.gameName} Deposit`,
-          category: 'Gaming',
-          seller: 'Shawn Sweepstakes',
-          seller_id: 'shawn-sweepstakes'
-        }
-      }
+      })
     }
 
-    // Create signature for the order
+    // Create signature following Wert documentation
     const signatureData = {
-      address: orderData.address,
-      commodity: orderData.commodity,
-      commodity_amount: orderData.commodity_amount,
-      network: orderData.network,
-      click_id: orderData.click_id
+      address: widgetParams.address,
+      commodity: widgetParams.commodity,
+      commodity_amount: widgetParams.commodity_amount,
+      network: widgetParams.network,
+      click_id: widgetParams.click_id
     }
 
-    // Create signature string (alphabetically sorted)
+    // Create signature string (alphabetically sorted keys)
     const signatureString = Object.keys(signatureData)
       .sort()
       .map(key => `${key}=${signatureData[key]}`)
@@ -97,18 +75,17 @@ Deno.serve(async (req) => {
 
     console.log('Signature string:', signatureString)
 
-    // Create HMAC signature
-    const signature = createHmac('sha256', privateKey.slice(2)) // Remove 0x prefix
+    // Create HMAC signature (remove 0x prefix from private key)
+    const signature = createHmac('sha256', privateKey.slice(2))
       .update(signatureString)
       .digest('hex')
 
     console.log('Generated signature:', signature)
 
-    // Create Wert widget URL
+    // Build widget URL
     const baseUrl = 'https://sandbox-widget.wert.io'
-    const widgetParams = new URLSearchParams({
-      partner_id: partnerId,
-      ...widgetData,
+    const urlParams = new URLSearchParams({
+      ...widgetParams,
       commodity_amount: amount.toString(),
       signature: signature,
       theme: 'dark',
@@ -118,11 +95,10 @@ Deno.serve(async (req) => {
       color_icons: '3B82F6'
     })
 
-    const paymentUrl = `${baseUrl}?${widgetParams.toString()}`
-
+    const paymentUrl = `${baseUrl}?${urlParams.toString()}`
     console.log('Generated payment URL:', paymentUrl)
 
-    // Update deposit record with Wert order ID
+    // Update deposit record
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
@@ -144,20 +120,6 @@ Deno.serve(async (req) => {
         console.log('Deposit updated successfully')
       }
     }
-
-    // Create signature string (only for required fields)
-    const signatureFields = {
-      address: widgetData.address,
-      commodity: widgetData.commodity,
-      commodity_amount: widgetData.commodity_amount,
-      network: widgetData.network,
-      click_id: widgetData.click_id
-    }
-    
-    const signatureString2 = Object.keys(signatureFields)
-      .sort()
-      .map(key => `${key}=${signatureFields[key]}`)
-      .join('&')
 
     return new Response(
       JSON.stringify({

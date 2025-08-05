@@ -13,6 +13,8 @@ export const createPayment = async (paymentData: {
   };
 }) => {
   try {
+    console.log('Creating Wert payment with data:', paymentData);
+    
     const supabaseUrl = 'https://vbeirjdjfvmtwkljscwb.supabase.co';
     const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZWlyamRqZnZtdHdrbGpzY3diIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1MjM4NzAsImV4cCI6MjA2OTA5OTg3MH0.D6wvYJ9AwwuZn56nWq5FFwLCnuAIoyljQM2tR1Ze7DI';
     
@@ -25,11 +27,16 @@ export const createPayment = async (paymentData: {
       body: JSON.stringify(paymentData),
     });
 
+    console.log('Payment function response status:', response.status);
+    
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Payment function error response:', errorText);
       throw new Error('Failed to create payment');
     }
 
     const data = await response.json();
+    console.log('Payment function success response:', data);
     return data;
   } catch (error) {
     console.error('Error creating payment:', error);

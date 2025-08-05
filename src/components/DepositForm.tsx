@@ -24,7 +24,7 @@ const depositSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number"),
   gameName: z.string().min(1, "Game name is required"),
-  amount: z.string().min(1, "Amount is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Amount must be a valid number greater than 0"),
+  amount: z.string().min(1, "Amount is required").refine((val) => !isNaN(Number(val)) && Number(val) >= 10, "Minimum deposit amount is $10"),
 });
 
 type DepositFormData = z.infer<typeof depositSchema>;
@@ -49,6 +49,13 @@ export const DepositForm = () => {
   const onSubmit = async (data: DepositFormData) => {
     setIsSubmitting(true);
     try {
+      console.log('Starting deposit process with data:', {
+        username: data.username,
+        email: data.email,
+        gameName: data.gameName,
+        amount: data.amount
+      });
+
       // First create the deposit record
       const { data: depositData, error } = await supabase
         .from("deposits")
@@ -100,10 +107,6 @@ export const DepositForm = () => {
         throw new Error('No payment URL received from payment system');
       }
 
-      toast({
-        title: "Processing Deposit",
-        description: "Opening secure payment page...",
-      });
 
       // Close the dialog and reset form
       setIsOpen(false);

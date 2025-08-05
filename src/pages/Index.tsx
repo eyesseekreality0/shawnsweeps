@@ -1,12 +1,15 @@
 import { useState, useMemo } from "react";
+import { useEffect } from "react";
 import { CasinoBackground } from "@/components/CasinoBackground";
 import { DepositForm } from "@/components/DepositForm";
 import { GameSearch } from "@/components/GameSearch";
 import { games } from "@/data/games";
 import { ExternalLink } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
 
   const filteredGames = useMemo(() => {
     if (!searchTerm) return games;
@@ -15,6 +18,28 @@ const Index = () => {
     );
   }, [searchTerm]);
 
+  // Check for payment success/failure in URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    
+    if (paymentStatus === 'success') {
+      toast({
+        title: "Payment Successful!",
+        description: "Your deposit has been processed successfully. You can now start playing!",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (paymentStatus === 'failed') {
+      toast({
+        title: "Payment Failed",
+        description: "Your payment could not be processed. Please try again.",
+        variant: "destructive",
+      });
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [toast]);
   const handleGameClick = (gameUrl: string) => {
     window.open(gameUrl, '_blank', 'noopener,noreferrer');
   };

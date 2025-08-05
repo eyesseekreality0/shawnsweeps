@@ -17,7 +17,10 @@ Deno.serve(async (req) => {
     console.log('=== Wert Webhook Received ===')
     console.log('Method:', req.method)
     console.log('URL:', req.url)
-    console.log('Headers:', Object.fromEntries(req.headers.entries()))
+    
+    // Log all headers for debugging
+    const headers = Object.fromEntries(req.headers.entries())
+    console.log('Headers:', headers)
 
     const body = await req.text()
     console.log('Raw webhook body:', body)
@@ -25,7 +28,7 @@ Deno.serve(async (req) => {
     // Wert webhook secret for signature verification
     const webhookSecret = '0x57466afb5491ee372b3b30d82ef7e7a0583c9e36aef0f02435bd164fe172b1d3'
     
-    // Get signature from headers
+    // Get signature from headers (try multiple possible header names)
     const signature = req.headers.get('x-wert-signature') || 
                      req.headers.get('wert-signature') ||
                      req.headers.get('signature')
@@ -34,22 +37,28 @@ Deno.serve(async (req) => {
 
     // Verify webhook signature if present
     if (signature && webhookSecret) {
-      const key = webhookSecret.startsWith('0x') ? webhookSecret.slice(2) : webhookSecret
-      const expectedSignature = createHmac('sha256', key)
-        .update(body)
-        .digest('hex')
-      
-      console.log('Expected signature:', expectedSignature)
-      
-      const cleanSignature = signature.replace('sha256=', '').replace('0x', '')
-      
-      if (cleanSignature !== expectedSignature) {
-        console.warn('Signature mismatch - continuing for testing')
-        console.warn('Received:', cleanSignature)
-        console.warn('Expected:', expectedSignature)
-      } else {
-        console.log('✅ Signature verified successfully')
+      try {
+        const key = webhookSecret.startsWith('0x') ? webhookSecret.slice(2) : webhookSecret
+        const expectedSignature = createHmac('sha256', key)
+          .update(body)
+          .digest('hex')
+        
+        console.log('Expected signature:', expectedSignature)
+        
+        const cleanSignature = signature.replace('sha256=', '').replace('0x', '')
+        
+        if (cleanSignature !== expectedSignature) {
+          console.warn('⚠️ Signature mismatch - continuing anyway for testing')
+          console.warn('Received:', cleanSignature)
+          console.warn('Expected:', expectedSignature)
+        } else {
+          console.log('✅ Signature verified successfully')
+        }
+      } catch (sigError) {
+        console.error('Error verifying signature:', sigError)
       }
+    } else {
+      console.log('ℹ️ No signature provided or webhook secret missing')
     }
 
     // Parse webhook payload
@@ -57,12 +66,13 @@ Deno.serve(async (req) => {
     try {
       event = JSON.parse(body)
       console.log('📦 Parsed webhook event:', JSON.stringify(event, null, 2))
-    } catch (err) {
-      console.error('❌ Invalid JSON in webhook body:', err)
+    } catch (parseError) {
+      console.error('❌ Invalid JSON in webhook body:', parseError)
       return new Response(
         JSON.stringify({ 
           success: true,
-          message: 'Webhook received but invalid JSON'
+          message: 'Webhook received but invalid JSON',
+          received_body: body
         }),
         { 
           status: 200,
@@ -75,24 +85,27 @@ Deno.serve(async (req) => {
     const eventType = event.type
     const clickId = event.click_id
     const order = event.order || {}
-    const orderId = order.id
+    const orderId = order.id || order.order_id
     const orderStatus = order.status
+    const transactionId = order.transaction_id
     
     console.log('📋 Event details:')
     console.log('  Type:', eventType)
     console.log('  Click ID:', clickId)
     console.log('  Order ID:', orderId)
     console.log('  Order Status:', orderStatus)
+    console.log('  Transaction ID:', transactionId)
 
     // Handle test webhooks
     if (eventType === 'test') {
-      console.log('🧪 Test webhook received - no database update needed')
+      console.log('🧪 Test webhook received - responding with success')
       return new Response(
         JSON.stringify({ 
           success: true,
           message: 'Test webhook processed successfully',
           event_type: eventType,
-          click_id: clickId
+          click_id: clickId,
+          timestamp: new Date().toISOString()
         }),
         { 
           status: 200,
@@ -101,7 +114,7 @@ Deno.serve(async (req) => {
       )
     }
 
-    // Initialize Supabase client for non-test events
+    // Initialize Supabase client for real events
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
@@ -124,18 +137,24 @@ Deno.serve(async (req) => {
     // Map Wert order status to our deposit status
     let depositStatus = 'pending'
     
-    switch (orderStatus) {
+    switch (orderStatus?.toLowerCase()) {
       case 'completed':
       case 'success':
+      case 'confirmed':
         depositStatus = 'completed'
         break
       case 'failed':
       case 'error':
+      case 'rejected':
         depositStatus = 'failed'
         break
       case 'cancelled':
       case 'canceled':
         depositStatus = 'cancelled'
+        break
+      case 'pending':
+      case 'processing':
+        depositStatus = 'pending'
         break
       default:
         depositStatus = 'pending'
@@ -157,6 +176,7 @@ Deno.serve(async (req) => {
 
       if (updateError) {
         console.error('❌ Error updating deposit:', updateError)
+        // Still return success to prevent Wert retries
       } else {
         console.log('✅ Deposit updated successfully:', updateData)
       }
@@ -164,7 +184,7 @@ Deno.serve(async (req) => {
       console.log('ℹ️ No valid click_id found, skipping database update')
     }
 
-    // Return success response
+    // Always return success to prevent Wert from retrying
     return new Response(
       JSON.stringify({ 
         success: true,
@@ -172,7 +192,8 @@ Deno.serve(async (req) => {
         event_type: eventType,
         click_id: clickId,
         order_id: orderId,
-        status: depositStatus
+        status: depositStatus,
+        timestamp: new Date().toISOString()
       }),
       { 
         status: 200,
@@ -189,7 +210,8 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: `Webhook received but processing failed: ${error.message}`
+        message: `Webhook received but processing failed: ${error.message}`,
+        timestamp: new Date().toISOString()
       }),
       { 
         status: 200,

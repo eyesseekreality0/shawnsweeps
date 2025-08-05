@@ -128,10 +128,25 @@ Deno.serve(async (req) => {
     console.log('Order created:', data)
 
     // Update deposit record with order ID
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase environment variables')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Server configuration error',
+          type: 'config_error'
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
     const orderId = data.id || data.order_id
     if (orderId) {

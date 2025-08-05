@@ -255,7 +255,7 @@ export const DepositForm = () => {
                 <h4 className="text-sm sm:text-base font-medium">Secure Payment Information:</h4>
               </div>
               <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
-                <li>Your payment is processed securely by Vert</li>
+                <li>Your payment is processed securely</li>
                 <li>We never store your payment information</li>
                 <li>All transactions are encrypted and secure</li>
                 <li>You'll receive an email confirmation after payment</li>

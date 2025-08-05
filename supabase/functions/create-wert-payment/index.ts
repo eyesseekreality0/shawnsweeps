@@ -37,10 +37,28 @@ Deno.serve(async (req) => {
     const partnerId = '01K0FHM9K6ATK1CYCHMV34Z0YG'
     const privateKey = '0x57466afb5491ee372b3b30d82ef7e7a0583c9e36aef0f02435bd164fe172b1d3'
     const apiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
-    const apiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
     
     // Create Wert order using their API
     const orderData = {
+      partner_id: partnerId,
+      click_id: metadata.depositId,
+      origin: 'https://shawn-sweepstakes.com',
+      commodity: 'USDC',
+      commodity_amount: amount,
+      network: 'ethereum',
+      address: '0xA0b86a33E6441e6e80A7181a02F6109c4E8c1b8E', // USDC contract address
+      redirect_url: 'https://shawn-sweepstakes.com',
+      extra: {
+        item_info: {
+          author: 'Shawn Sweepstakes',
+          name: `${metadata.gameName} Deposit`,
+          category: 'Gaming',
+          seller: 'Shawn Sweepstakes',
+          seller_id: 'shawn-sweepstakes'
+        }
+      }
+    }
+    
     // Wert widget configuration
     const widgetData = {
       partner_id: partnerId,
@@ -90,7 +108,6 @@ Deno.serve(async (req) => {
     const baseUrl = 'https://sandbox-widget.wert.io'
     const widgetParams = new URLSearchParams({
       partner_id: partnerId,
-    const widgetParams = new URLSearchParams({
       ...widgetData,
       commodity_amount: amount.toString(),
       signature: signature,
@@ -137,7 +154,13 @@ Deno.serve(async (req) => {
       click_id: widgetData.click_id
     }
     
-    const signatureString = Object.keys(signatureFields)
+    const signatureString2 = Object.keys(signatureFields)
+      .sort()
+      .map(key => `${key}=${signatureFields[key]}`)
+      .join('&')
+
+    return new Response(
+      JSON.stringify({
         success: true, 
         paymentUrl: paymentUrl,
         orderId: metadata.depositId,
@@ -147,7 +170,7 @@ Deno.serve(async (req) => {
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      .map(key => `${key}=${signatureFields[key]}`)
+      }
     )
 
   } catch (error) {

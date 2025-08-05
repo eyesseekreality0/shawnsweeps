@@ -36,20 +36,45 @@ Deno.serve(async (req) => {
     // Wert.io sandbox credentials
     const partnerId = '01K0FHM9K6ATK1CYCHMV34Z0YG'
     const privateKey = '0x57466afb5491ee372b3b30d82ef7e7a0583c9e36aef0f02435bd164fe172b1d3'
+    const apiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
+    const apiKey = '776572742d6465762d63386637633633352d316333662d343034392d383732622d376637313837643332306134'
     
-    // Generate signature for Wert widget
-    const signedData = {
-      address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI contract address
+    // Create Wert order using their API
+    const orderData = {
+    // Wert widget configuration
+    const widgetData = {
+      partner_id: partnerId,
+      click_id: metadata.depositId,
+      origin: 'https://shawn-sweepstakes.com',
       commodity: 'USDC',
       commodity_amount: amount,
       network: 'ethereum',
-      click_id: metadata.depositId,
+      address: '0xA0b86a33E6441e6e80A7181a02F6109c4E8c1b8E', // USDC contract address
+      redirect_url: 'https://shawn-sweepstakes.com',
+      extra: {
+        item_info: {
+          author: 'Shawn Sweepstakes',
+          name: `${metadata.gameName} Deposit`,
+          category: 'Gaming',
+          seller: 'Shawn Sweepstakes',
+          seller_id: 'shawn-sweepstakes'
+        }
+      }
     }
 
-    // Create signature string
-    const signatureString = Object.keys(signedData)
+    // Create signature for the order
+    const signatureData = {
+      address: orderData.address,
+      commodity: orderData.commodity,
+      commodity_amount: orderData.commodity_amount,
+      network: orderData.network,
+      click_id: orderData.click_id
+    }
+
+    // Create signature string (alphabetically sorted)
+    const signatureString = Object.keys(signatureData)
       .sort()
-      .map(key => `${key}=${signedData[key]}`)
+      .map(key => `${key}=${signatureData[key]}`)
       .join('&')
 
     console.log('Signature string:', signatureString)
@@ -61,29 +86,26 @@ Deno.serve(async (req) => {
 
     console.log('Generated signature:', signature)
 
-    // Build Wert widget URL with all parameters
+    // Create Wert widget URL
     const baseUrl = 'https://sandbox-widget.wert.io'
     const widgetParams = new URLSearchParams({
       partner_id: partnerId,
-      click_id: metadata.depositId,
-      origin: 'https://sandbox.wert.io',
-      theme: 'dark',
-      color_buttons: '01D4AA',
-      color_secondary: '344152', 
-      color_main: 'FFFFFF',
-      color_icons: '01D4AA',
-      commodity: 'USDC',
+    const widgetParams = new URLSearchParams({
+      ...widgetData,
       commodity_amount: amount.toString(),
-      network: 'ethereum',
-      address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
       signature: signature,
+      theme: 'dark',
+      color_buttons: '3B82F6',
+      color_secondary: '1E293B',
+      color_main: 'FFFFFF',
+      color_icons: '3B82F6'
     })
 
     const paymentUrl = `${baseUrl}?${widgetParams.toString()}`
 
     console.log('Generated payment URL:', paymentUrl)
 
-    // Update deposit record with pending status
+    // Update deposit record with Wert order ID
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
@@ -94,7 +116,8 @@ Deno.serve(async (req) => {
         .from('deposits')
         .update({ 
           status: 'pending',
-          wert_order_id: metadata.depositId // Use deposit ID as order reference
+          wert_order_id: metadata.depositId,
+          updated_at: new Date().toISOString()
         })
         .eq('id', metadata.depositId)
 
@@ -105,8 +128,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({ 
+    // Create signature string (only for required fields)
+    const signatureFields = {
+      address: widgetData.address,
+      commodity: widgetData.commodity,
+      commodity_amount: widgetData.commodity_amount,
+      network: widgetData.network,
+      click_id: widgetData.click_id
+    }
+    
+    const signatureString = Object.keys(signatureFields)
         success: true, 
         paymentUrl: paymentUrl,
         orderId: metadata.depositId,
@@ -116,7 +147,7 @@ Deno.serve(async (req) => {
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      .map(key => `${key}=${signatureFields[key]}`)
     )
 
   } catch (error) {

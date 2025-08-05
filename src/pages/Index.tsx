@@ -27,7 +27,7 @@ const Index = () => {
         {/* Logo Section */}
         <section className="text-center py-2 sm:py-3 px-4">
           <img 
-            src="https://shawn-sweepstakes.carrd.co/assets/images/image03.png?v=0c91e9dc" 
+            src="/lovable-uploads/fe59b40d-e5fd-4762-858c-1276be42711b.png" 
             alt="Shawn Sweepstakes Logo" 
             className="mx-auto max-w-[280px] sm:max-w-xs md:max-w-sm w-full h-auto"
           />
@@ -55,7 +55,7 @@ const Index = () => {
         {/* Promotional Banner */}
         <section className="text-center py-2 sm:py-3 px-4">
           <img 
-            src="https://shawn-sweepstakes.carrd.co/assets/images/image02.png?v=0c91e9dc" 
+            src="/lovable-uploads/0a72a758-c5cd-4fee-a196-97a26fc87cde.png" 
             alt="Special Promotion" 
             className="mx-auto max-w-sm sm:max-w-xl lg:max-w-2xl w-full h-auto rounded-lg shadow-lg"
           />

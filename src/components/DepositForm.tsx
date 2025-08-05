@@ -57,12 +57,12 @@ export const DepositForm = () => {
   const generatePaymentQR = async (amount: number, method: 'bitcoin' | 'lightning', depositId: string, customerEmail: string, username: string, gameName: string) => {
     try {
       // Create payment address via Paidly Interactive API
-      const { data: paidlyData, error: paidlyError } = await supabase.functions.invoke('create-paidly-checkout', {
+      const { data: paidlyData, error: paidlyError } = await supabase.functions.invoke('create-paidly-interactive-checkout', {
         body: {
           amount: amount,
           currency: 'USD',
           customerEmail: customerEmail,
-          description: `Casino deposit for ${gameName}`,
+          description: `Shawn Sweepstakes deposit for ${gameName}`,
           metadata: {
             depositId: depositId,
             username: username,
@@ -73,7 +73,7 @@ export const DepositForm = () => {
       });
 
       if (paidlyError || !paidlyData.success) {
-        console.error('Error creating Paidly checkout session:', paidlyError, paidlyData);
+        console.error('Error creating Paidly Interactive checkout session:', paidlyError, paidlyData);
         console.error('Full paidly response:', paidlyData);
         return null;
       }
@@ -82,7 +82,7 @@ export const DepositForm = () => {
       const link = paidlyData.checkoutUrl;
       const addressId = paidlyData.paymentAddressId;
       
-      // Generate QR code for the payment link (Paidly checkout page)
+      // Generate QR code for the payment link (Paidly Interactive checkout page)
       const qrUrl = await QRCode.toDataURL(link, {
         errorCorrectionLevel: 'M',
         margin: 2,
@@ -118,7 +118,7 @@ export const DepositForm = () => {
         throw error;
       }
 
-      // Generate payment address and QR code via TrySpeed
+      // Generate payment address and QR code via Paidly Interactive
       const paymentInfo = await generatePaymentQR(
         parseFloat(data.amount), 
         paymentMethod, 
@@ -131,7 +131,7 @@ export const DepositForm = () => {
       if (!paymentInfo) {
         toast({
           title: "Payment Setup Error", 
-          description: "Failed to create TrySpeed payment address. Check console for details.",
+          description: "Failed to create Paidly Interactive payment address. Check console for details.",
           variant: "destructive",
         });
         return;
@@ -148,7 +148,7 @@ export const DepositForm = () => {
       setShowPayment(true);
 
       toast({
-        title: "Paidly Deposit Created",
+        title: "Paidly Interactive Deposit Created",
         description: "Scan the QR code below with your Bitcoin wallet to complete payment via Paidly Interactive.",
       });
 
@@ -156,7 +156,7 @@ export const DepositForm = () => {
       console.error("Error submitting deposit:", error);
       toast({
         title: "Error",
-        description: "Failed to create Paidly deposit request. Please try again.",
+        description: "Failed to create Paidly Interactive deposit request. Please try again.",
         variant: "destructive",
       });
     } finally {

@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface PaidlyCheckoutRequest {
+interface PaidlyInteractiveCheckoutRequest {
   amount: number
   currency: string
   customerEmail: string
@@ -26,24 +26,24 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency, customerEmail, description, metadata }: PaidlyCheckoutRequest = await req.json()
+    const { amount, currency, customerEmail, description, metadata }: PaidlyInteractiveCheckoutRequest = await req.json()
 
-    console.log('Creating Paidly checkout session with data:', { amount, currency, customerEmail, description, metadata })
+    console.log('Creating Paidly Interactive checkout session with data:', { amount, currency, customerEmail, description, metadata })
 
-    // Paidly API credentials
-    const paidlyPartnerId = '01K1T8VJJ8TY67M49FDXY865GF'
-    const paidlyApiKey = '776572742d70726f642d33343733656162352d653566312d343363352d626535312d616531336165643361643539'
+    // Paidly Interactive API credentials
+    const paidlyApiKey = 'your-paidly-interactive-api-key' // Replace with your actual API key
+    const paidlyMerchantId = 'your-merchant-id' // Replace with your actual merchant ID
 
-    console.log('Using Paidly Partner ID:', paidlyPartnerId)
+    console.log('Using Paidly Interactive API')
 
-    // Create Paidly checkout session
-    const paidlyResponse = await fetch('https://api.paidly.io/v1/checkout/sessions', {
+    // Create Paidly Interactive checkout session
+    const paidlyResponse = await fetch('https://api.paidlyinteractive.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${paidlyApiKey}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'X-Partner-ID': paidlyPartnerId,
+        'X-Merchant-ID': paidlyMerchantId,
       },
       body: JSON.stringify({
         amount: Math.round(amount * 100), // Convert to cents
@@ -53,6 +53,7 @@ serve(async (req) => {
         payment_methods: [metadata.paymentMethod === 'lightning' ? 'lightning' : 'bitcoin'],
         success_url: `${req.headers.get('origin') || 'https://your-domain.com'}/success`,
         cancel_url: `${req.headers.get('origin') || 'https://your-domain.com'}/cancel`,
+        webhook_url: `${req.headers.get('origin') || 'https://your-domain.com'}/api/webhooks/paidly-interactive`,
         metadata: {
           deposit_id: metadata.depositId,
           username: metadata.username,
@@ -62,12 +63,12 @@ serve(async (req) => {
     })
 
     const paidlyData = await paidlyResponse.text()
-    console.log('Paidly API response status:', paidlyResponse.status)
-    console.log('Paidly API response headers:', Object.fromEntries(paidlyResponse.headers.entries()))
-    console.log('Paidly API response body:', paidlyData)
+    console.log('Paidly Interactive API response status:', paidlyResponse.status)
+    console.log('Paidly Interactive API response headers:', Object.fromEntries(paidlyResponse.headers.entries()))
+    console.log('Paidly Interactive API response body:', paidlyData)
 
     if (!paidlyResponse.ok) {
-      console.error('Paidly API error details:')
+      console.error('Paidly Interactive API error details:')
       console.error('Status:', paidlyResponse.status)
       console.error('StatusText:', paidlyResponse.statusText)
       console.error('Response:', paidlyData)
@@ -75,7 +76,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Paidly API error: ${paidlyResponse.status} - ${paidlyData}`,
+          error: `Paidly Interactive API error: ${paidlyResponse.status} - ${paidlyData}`,
           details: {
             status: paidlyResponse.status,
             statusText: paidlyResponse.statusText,
@@ -90,7 +91,7 @@ serve(async (req) => {
     }
 
     const checkoutData = JSON.parse(paidlyData)
-    console.log('Paidly checkout session created successfully:', checkoutData)
+    console.log('Paidly Interactive checkout session created successfully:', checkoutData)
 
     // Update the deposit record with the checkout session ID
     const supabase = createClient(
@@ -101,7 +102,7 @@ serve(async (req) => {
     const { error: updateError } = await supabase
       .from('deposits')
       .update({ 
-        paidly_checkout_session_id: checkoutData.id,
+        paidly_interactive_checkout_session_id: checkoutData.id,
         status: 'pending_payment' 
       })
       .eq('id', metadata.depositId)
@@ -129,7 +130,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error creating Paidly checkout session:', error)
+    console.error('Error creating Paidly Interactive checkout session:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

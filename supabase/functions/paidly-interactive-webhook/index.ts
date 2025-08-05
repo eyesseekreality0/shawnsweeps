@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const webhookPayload = await req.json()
-    console.log('Paidly webhook received:', webhookPayload)
+    console.log('Paidly Interactive webhook received:', webhookPayload)
 
     // Initialize Supabase client
     const supabase = createClient(
@@ -28,7 +28,7 @@ serve(async (req) => {
       .insert({
         event_type: webhookPayload.type || 'unknown',
         payload: webhookPayload,
-        source: 'paidly'
+        source: 'paidly_interactive'
       })
 
     if (logError) {
@@ -37,7 +37,8 @@ serve(async (req) => {
 
     // Process the webhook based on event type
     if (webhookPayload.type === 'checkout.session.completed' || 
-        webhookPayload.type === 'payment.succeeded') {
+        webhookPayload.type === 'payment.succeeded' ||
+        webhookPayload.type === 'payment.confirmed') {
       
       const sessionId = webhookPayload.data?.object?.id || webhookPayload.data?.id
       const metadata = webhookPayload.data?.object?.metadata || webhookPayload.data?.metadata
@@ -46,7 +47,7 @@ serve(async (req) => {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'completed' })
-          .eq('paidly_checkout_session_id', sessionId)
+          .eq('paidly_interactive_checkout_session_id', sessionId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
@@ -55,7 +56,8 @@ serve(async (req) => {
         }
       }
     } else if (webhookPayload.type === 'checkout.session.expired' || 
-               webhookPayload.type === 'payment.failed') {
+               webhookPayload.type === 'payment.failed' ||
+               webhookPayload.type === 'payment.cancelled') {
       
       const sessionId = webhookPayload.data?.object?.id || webhookPayload.data?.id
       
@@ -63,7 +65,7 @@ serve(async (req) => {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'failed' })
-          .eq('paidly_checkout_session_id', sessionId)
+          .eq('paidly_interactive_checkout_session_id', sessionId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
@@ -82,7 +84,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error processing Paidly webhook:', error)
+    console.error('Error processing Paidly Interactive webhook:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

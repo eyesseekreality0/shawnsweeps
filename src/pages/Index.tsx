@@ -26,14 +26,14 @@ const Index = () => {
     if (paymentStatus === 'success') {
       toast({
         title: "Payment Successful!",
-        description: "Your deposit has been processed successfully. You can now start playing!",
+        description: "Your crypto purchase via Wert was successful! You can now start playing!",
       });
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (paymentStatus === 'failed') {
       toast({
         title: "Payment Failed",
-        description: "Your payment could not be processed. Please try again.",
+        description: "Your crypto purchase could not be processed. Please try again.",
         variant: "destructive",
       });
       // Clean up URL

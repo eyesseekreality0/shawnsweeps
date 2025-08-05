@@ -1,7 +1,5 @@
-import { supabase } from '@/integrations/supabase/client';
-
-// Payment utilities for Shawn Sweepstakes
-export const createPayment = async (paymentData: {
+// Wert.io payment integration for Shawn Sweepstakes
+export const createWertPayment = async (paymentData: {
   amount: number;
   currency: string;
   customerEmail: string;
@@ -27,23 +25,23 @@ export const createPayment = async (paymentData: {
       body: JSON.stringify(paymentData),
     });
 
-    console.log('Payment function response status:', response.status);
+    console.log('Wert payment function response status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Payment function error response:', errorText);
-      throw new Error('Failed to create payment');
+      console.error('Wert payment function error response:', errorText);
+      throw new Error('Failed to create Wert payment');
     }
 
     const data = await response.json();
-    console.log('Payment function success response:', data);
+    console.log('Wert payment function success response:', data);
     return data;
   } catch (error) {
-    console.error('Error creating payment:', error);
+    console.error('Error creating Wert payment:', error);
     throw error;
   }
 };
 
-export const redirectToPayment = (paymentUrl: string) => {
+export const openWertWidget = (paymentUrl: string) => {
   window.open(paymentUrl, '_blank', 'noopener,noreferrer');
 };

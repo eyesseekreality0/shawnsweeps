@@ -16,7 +16,6 @@ import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { CreditCard, Loader2, Shield } from 'lucide-react';
-import { createPayment } from "@/lib/wert";
 
 const depositSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -49,14 +48,14 @@ export const DepositForm = () => {
   const onSubmit = async (data: DepositFormData) => {
     setIsSubmitting(true);
     try {
-      console.log('Starting deposit process with data:', {
+      console.log('Starting Wert deposit process with data:', {
         username: data.username,
         email: data.email,
         gameName: data.gameName,
         amount: data.amount
       });
 
-      // First create the deposit record
+      // Create the deposit record in Supabase
       const { data: depositData, error } = await supabase
         .from("deposits")
         .insert({
@@ -77,36 +76,54 @@ export const DepositForm = () => {
 
       console.log('Deposit created successfully:', depositData);
 
-      // Create payment session
-      console.log('Creating payment for deposit:', depositData.id);
+      // Create Wert payment session
+      const supabaseUrl = 'https://vbeirjdjfvmtwkljscwb.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiZWlyamRqZnZtdHdrbGpzY3diIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1MjM4NzAsImV4cCI6MjA2OTA5OTg3MH0.D6wvYJ9AwwuZn56nWq5FFwLCnuAIoyljQM2tR1Ze7DI';
       
-      const paymentResponse = await createPayment({
-        amount: parseFloat(data.amount),
-        currency: 'USD',
-        customerEmail: data.email,
-        description: `Shawn Sweepstakes - ${data.gameName} deposit`,
-        metadata: {
-          depositId: depositData.id,
-          username: data.username,
-          gameName: data.gameName
-        }
+      const response = await fetch(`${supabaseUrl}/functions/v1/create-wert-payment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: parseFloat(data.amount),
+          currency: 'USD',
+          customerEmail: data.email,
+          description: `Shawn Sweepstakes - ${data.gameName} deposit`,
+          metadata: {
+            depositId: depositData.id,
+            username: data.username,
+            gameName: data.gameName
+          }
+        }),
       });
 
-      console.log('Payment response:', paymentResponse);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Wert payment function error:', errorText);
+        throw new Error('Failed to create Wert payment session');
+      }
+
+      const paymentResponse = await response.json();
+      console.log('Wert payment response:', paymentResponse);
 
       if (!paymentResponse.success) {
-        throw new Error(paymentResponse.error || 'Failed to create payment session');
+        throw new Error(paymentResponse.error || 'Failed to create Wert payment session');
       }
 
-      // Redirect to payment page
-      const paymentUrl = paymentResponse.paymentUrl;
-      if (paymentUrl) {
-        console.log('Redirecting to payment URL:', paymentUrl);
-        window.open(paymentUrl, '_blank', 'noopener,noreferrer');
+      // Open Wert widget in new window
+      if (paymentResponse.paymentUrl) {
+        console.log('Opening Wert widget:', paymentResponse.paymentUrl);
+        window.open(paymentResponse.paymentUrl, '_blank', 'noopener,noreferrer');
+        
+        toast({
+          title: "Payment Window Opened",
+          description: "Complete your crypto purchase in the new window to deposit funds.",
+        });
       } else {
-        throw new Error('No payment URL received from payment system');
+        throw new Error('No payment URL received from Wert');
       }
-
 
       // Close the dialog and reset form
       setIsOpen(false);
@@ -142,9 +159,9 @@ export const DepositForm = () => {
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Secure Deposit</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Secure Crypto Deposit</DialogTitle>
           <DialogDescription className="text-center text-sm sm:text-base">
-            Secure deposit - Buy crypto with your card and deposit instantly. All fields are required.
+            Buy crypto with your card and deposit instantly via Wert.io. All fields are required.
           </DialogDescription>
         </DialogHeader>
         
@@ -252,8 +269,8 @@ export const DepositForm = () => {
                     <Input 
                       type="number" 
                       step="0.01" 
-                      min="0" 
-                      placeholder="Enter deposit amount" 
+                      min="10" 
+                      placeholder="Enter deposit amount (min $10)" 
                       className="h-10 sm:h-11 text-base"
                       {...field} 
                     />
@@ -263,17 +280,18 @@ export const DepositForm = () => {
               )}
             />
 
-            {/* Security Information */}
+            {/* Wert Security Information */}
             <div className="bg-muted p-3 sm:p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <Shield className="w-4 h-4 mr-2 text-green-600" />
-                <h4 className="text-sm sm:text-base font-medium">Secure Crypto Purchase:</h4>
+                <h4 className="text-sm sm:text-base font-medium">Powered by Wert.io:</h4>
               </div>
               <ul className="text-xs sm:text-sm space-y-1 list-disc list-inside text-muted-foreground">
                 <li>Buy crypto instantly with your debit/credit card</li>
                 <li>Bank-level encryption and security</li>
                 <li>KYC/AML compliant and regulated</li>
                 <li>Instant deposit processing</li>
+                <li>Trusted by leading crypto platforms</li>
               </ul>
             </div>
             
@@ -285,12 +303,12 @@ export const DepositForm = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Processing Deposit...
+                  Opening Wert Widget...
                 </>
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Make Deposit
+                  Buy Crypto & Deposit
                 </>
               )}
             </Button>

@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     // Create Vert payment session
     const vertPayload = {
       partner_id: vertPartnerId,
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: amount, // Vert expects dollar amount, not cents
       currency: currency.toUpperCase(),
       customer_email: customerEmail,
       description: description,
@@ -59,13 +59,12 @@ Deno.serve(async (req) => {
         username: metadata.username,
         game_name: metadata.gameName,
       },
-      success_url: `${req.headers.get('origin') || 'https://your-domain.com'}/payment-success`,
-      cancel_url: `${req.headers.get('origin') || 'https://your-domain.com'}/payment-cancelled`,
+      return_url: `${req.headers.get('origin') || 'https://vbeirjdjfvmtwkljscwb.supabase.co'}`,
     }
 
     console.log('Sending request to Vert API with payload:', vertPayload)
 
-    const vertResponse = await fetch('https://api.vert.co/v1/payment-sessions', {
+    const vertResponse = await fetch('https://api.vert.co/v1/payments', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${vertApiKey}`,

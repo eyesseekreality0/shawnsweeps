@@ -77,6 +77,8 @@ export const DepositForm = () => {
         throw new Error('Supabase configuration missing');
       }
 
+      console.log('Creating Vert payment for deposit:', depositData.id);
+
       const vertResponse = await fetch(`${supabaseUrl}/functions/v1/create-vert-payment`, {
         method: 'POST',
         headers: {
@@ -96,6 +98,8 @@ export const DepositForm = () => {
         })
       });
 
+      console.log('Vert response status:', vertResponse.status);
+      
       if (!vertResponse.ok) {
         const errorText = await vertResponse.text();
         console.error('Vert payment creation failed:', errorText);
@@ -109,14 +113,19 @@ export const DepositForm = () => {
         console.error('Error creating Vert payment:', vertData);
         toast({
           title: "Payment Setup Error", 
-          description: vertData?.error || "Failed to create payment session. Please try again.",
+          description: vertData?.error || vertData?.message || "Failed to create payment session. Please try again.",
           variant: "destructive",
         });
         return;
       }
 
       // Redirect to Vert payment page
-      window.open(vertData.paymentUrl, '_blank', 'noopener,noreferrer');
+      const paymentUrl = vertData.paymentUrl || vertData.payment_url || vertData.url;
+      if (paymentUrl) {
+        window.open(paymentUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        throw new Error('No payment URL received from Vert');
+      }
 
       toast({
         title: "Payment Session Created",

@@ -1,7 +1,7 @@
 project_id = "vbeirjdjfvmtwkljscwb"
 
-[functions.create-stripe-payment-intent]
+[functions.create-vert-payment]
 verify_jwt = false
 
-[functions.stripe-webhook]
+[functions.vert-webhook]
 verify_jwt = false

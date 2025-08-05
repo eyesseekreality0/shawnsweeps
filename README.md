@@ -59,7 +59,7 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-- Stripe for payments
+- Vert for payments
 - Supabase for backend
 
 ## How can I deploy this project?

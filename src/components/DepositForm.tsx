@@ -57,18 +57,33 @@ export const DepositForm = () => {
           phone: data.phone,
           game_name: data.gameName,
           amount: parseFloat(data.amount),
-          status: "pending_payment",
+          status: "pending",
         })
         .select()
         .single();
 
       if (error) {
+        console.error('Database error:', error);
         throw error;
       }
 
+      console.log('Deposit created successfully:', depositData);
+
       // Create Vert payment session
-      const { data: vertData, error: vertError } = await supabase.functions.invoke('create-vert-payment', {
-        body: {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Supabase configuration missing');
+      }
+
+      const vertResponse = await fetch(`${supabaseUrl}/functions/v1/create-vert-payment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           amount: parseFloat(data.amount),
           currency: 'USD',
           customerEmail: data.email,
@@ -78,11 +93,20 @@ export const DepositForm = () => {
             username: data.username,
             gameName: data.gameName
           }
-        }
+        })
       });
 
-      if (vertError || !vertData.success) {
-        console.error('Error creating Vert payment:', vertError, vertData);
+      if (!vertResponse.ok) {
+        const errorText = await vertResponse.text();
+        console.error('Vert payment creation failed:', errorText);
+        throw new Error(`Payment creation failed: ${errorText}`);
+      }
+
+      const vertData = await vertResponse.json();
+      console.log('Vert payment response:', vertData);
+
+      if (!vertData.success) {
+        console.error('Error creating Vert payment:', vertData);
         toast({
           title: "Payment Setup Error", 
           description: vertData?.error || "Failed to create payment session. Please try again.",
@@ -107,7 +131,7 @@ export const DepositForm = () => {
       console.error("Error submitting deposit:", error);
       toast({
         title: "Error",
-        description: "Failed to create deposit request. Please try again.",
+        description: error.message || "Failed to create deposit request. Please try again.",
         variant: "destructive",
       });
     } finally {

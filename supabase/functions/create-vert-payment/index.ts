@@ -1,5 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,7 +18,7 @@ interface VertPaymentRequest {
   }
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -60,18 +59,17 @@ serve(async (req) => {
         username: metadata.username,
         game_name: metadata.gameName,
       },
-      success_url: `${req.headers.get('origin')}/payment-success`,
-      cancel_url: `${req.headers.get('origin')}/payment-cancelled`,
+      success_url: `${req.headers.get('origin') || 'https://your-domain.com'}/payment-success`,
+      cancel_url: `${req.headers.get('origin') || 'https://your-domain.com'}/payment-cancelled`,
     }
 
     console.log('Sending request to Vert API with payload:', vertPayload)
 
-    const vertResponse = await fetch('https://api.vert.com/v1/payment-sessions', {
+    const vertResponse = await fetch('https://api.vert.co/v1/payment-sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${vertApiKey}`,
         'Content-Type': 'application/json',
-        'Partner-ID': vertPartnerId,
       },
       body: JSON.stringify(vertPayload)
     })
@@ -89,7 +87,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: `Vert API error: ${vertResponse.status} - ${vertData}`,
+          error: `Payment system error: ${vertResponse.status}. Please try again or contact support.`,
           details: {
             status: vertResponse.status,
             statusText: vertResponse.statusText,
@@ -103,7 +101,23 @@ serve(async (req) => {
       )
     }
 
-    const paymentSession = JSON.parse(vertData)
+    let paymentSession
+    try {
+      paymentSession = JSON.parse(vertData)
+    } catch (parseError) {
+      console.error('Error parsing Vert response:', parseError)
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Invalid response from payment system. Please try again.' 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     console.log('Vert payment session created successfully:', paymentSession)
 
     // Update the deposit record with the payment session ID
@@ -116,18 +130,20 @@ serve(async (req) => {
       .from('deposits')
       .update({ 
         vert_payment_id: paymentSession.id,
-        status: 'pending_payment' 
+        status: 'pending' 
       })
       .eq('id', metadata.depositId)
 
     if (updateError) {
       console.error('Error updating deposit:', updateError)
+      // Don't fail the entire request if database update fails
+      // The payment session was created successfully
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        paymentUrl: paymentSession.payment_url,
+        paymentUrl: paymentSession.payment_url || paymentSession.url,
         paymentId: paymentSession.id,
         amount: amount,
         currency: currency

@@ -196,32 +196,36 @@ export const DepositForm = () => {
       <DialogTrigger asChild>
         <Button 
           size="lg" 
-          className="text-lg px-8 py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation"
           onClick={() => setIsOpen(true)}
         >
           Make a Deposit 💰
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-[95vw] max-w-md mx-auto max-h-[90vh] overflow-y-auto">
         {!showPayment ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl text-center text-casino-gold">Make a Deposit</DialogTitle>
-              <DialogDescription className="text-center">
+              <DialogTitle className="text-xl sm:text-2xl text-center text-casino-gold">Make a Deposit</DialogTitle>
+              <DialogDescription className="text-center text-sm sm:text-base">
                 Enter your details to make a deposit. All fields are required.
               </DialogDescription>
             </DialogHeader>
             
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your full name" {...field} />
+                        <Input 
+                          placeholder="Enter your full name" 
+                          className="h-10 sm:h-11 text-base"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -233,9 +237,13 @@ export const DepositForm = () => {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Username</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your username" {...field} />
+                        <Input 
+                          placeholder="Enter your username" 
+                          className="h-10 sm:h-11 text-base"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -247,9 +255,14 @@ export const DepositForm = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Email Address</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="Enter your email address" {...field} />
+                        <Input 
+                          type="email" 
+                          placeholder="Enter your email address" 
+                          className="h-10 sm:h-11 text-base"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -261,9 +274,14 @@ export const DepositForm = () => {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Phone Number</FormLabel>
                       <FormControl>
-                        <Input type="tel" placeholder="Enter your phone number" {...field} />
+                        <Input 
+                          type="tel" 
+                          placeholder="Enter your phone number" 
+                          className="h-10 sm:h-11 text-base"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -275,9 +293,13 @@ export const DepositForm = () => {
                   name="gameName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Game Name</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Game Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter the game name" {...field} />
+                        <Input 
+                          placeholder="Enter the game name" 
+                          className="h-10 sm:h-11 text-base"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -289,9 +311,16 @@ export const DepositForm = () => {
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount ($)</FormLabel>
+                      <FormLabel className="text-sm sm:text-base">Amount ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0" placeholder="Enter deposit amount" {...field} />
+                        <Input 
+                          type="number" 
+                          step="0.01" 
+                          min="0" 
+                          placeholder="Enter deposit amount" 
+                          className="h-10 sm:h-11 text-base"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -299,13 +328,13 @@ export const DepositForm = () => {
                 />
                 
                 <div className="space-y-2">
-                  <FormLabel>Payment Method</FormLabel>
-                  <div className="grid grid-cols-2 gap-2">
+                  <FormLabel className="text-sm sm:text-base">Payment Method</FormLabel>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     <Button
                       type="button"
                       variant={paymentMethod === 'bitcoin' ? 'default' : 'outline'}
                       onClick={() => setPaymentMethod('bitcoin')}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
                     >
                       <Bitcoin className="w-4 h-4" />
                       Bitcoin
@@ -314,7 +343,7 @@ export const DepositForm = () => {
                       type="button"
                       variant={paymentMethod === 'lightning' ? 'default' : 'outline'}
                       onClick={() => setPaymentMethod('lightning')}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
                     >
                       <Zap className="w-4 h-4" />
                       Lightning
@@ -324,7 +353,7 @@ export const DepositForm = () => {
                 
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30" 
+                  className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-casino-gold border border-casino-gold/30 touch-manipulation" 
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Processing..." : "Make a Deposit"}
@@ -335,10 +364,10 @@ export const DepositForm = () => {
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl text-center text-casino-gold">
+              <DialogTitle className="text-lg sm:text-2xl text-center text-casino-gold">
                 Paidly Interactive Payment - {paymentMethod === 'bitcoin' ? 'Bitcoin' : 'Lightning'}
               </DialogTitle>
-              <DialogDescription className="text-center">
+              <DialogDescription className="text-center text-sm sm:text-base">
                 Scan the QR code with your wallet or use the Paidly Interactive payment link
               </DialogDescription>
             </DialogHeader>
@@ -346,12 +375,12 @@ export const DepositForm = () => {
             <div className="space-y-4">
               {/* QR Code */}
               <div className="flex justify-center">
-                <div className="p-4 bg-white rounded-lg">
+                <div className="p-2 sm:p-4 bg-white rounded-lg">
                   {qrCodeUrl && (
                     <img 
                       src={qrCodeUrl} 
                       alt="Payment QR Code" 
-                      className="w-64 h-64"
+                      className="w-48 h-48 sm:w-64 sm:h-64"
                     />
                   )}
                 </div>
@@ -363,7 +392,7 @@ export const DepositForm = () => {
                   <p className="text-lg font-semibold text-casino-gold">
                     Amount: ${paymentAmount.toFixed(2)}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Paidly Interactive {paymentMethod === 'bitcoin' ? 'Bitcoin On-Chain' : 'Lightning Network'}
                   </p>
                 </div>
@@ -372,7 +401,7 @@ export const DepositForm = () => {
                 <div className="space-y-2">
                   <Button
                     onClick={() => window.open(paymentLink, '_blank')}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                    className="w-full h-11 sm:h-12 text-base sm:text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white touch-manipulation"
                     size="lg"
                   >
                     Pay with Paidly Interactive →
@@ -381,18 +410,18 @@ export const DepositForm = () => {
                 
                 {/* Address */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Paidly Interactive Payment Address:</label>
+                  <label className="text-xs sm:text-sm font-medium">Paidly Interactive Payment Address:</label>
                   <div className="flex items-center space-x-2">
                     <Input 
                       value={paymentAddress} 
                       readOnly 
-                      className="text-xs"
+                      className="text-xs sm:text-sm h-9 sm:h-10"
                     />
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={copyToClipboard}
-                      className="shrink-0"
+                      className="shrink-0 h-9 sm:h-10 px-2 sm:px-3 touch-manipulation"
                     >
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </Button>
@@ -401,9 +430,9 @@ export const DepositForm = () => {
               </div>
               
               {/* Instructions */}
-              <div className="bg-muted p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Paidly Interactive Payment Instructions:</h4>
-                <ol className="text-sm space-y-1 list-decimal list-inside">
+              <div className="bg-muted p-3 sm:p-4 rounded-lg">
+                <h4 className="text-sm sm:text-base font-medium mb-2">Paidly Interactive Payment Instructions:</h4>
+                <ol className="text-xs sm:text-sm space-y-1 list-decimal list-inside">
                   <li>Open your Bitcoin wallet app</li>
                   <li>Scan the QR code above or copy the Paidly Interactive address</li>
                   <li>Send exactly ${paymentAmount.toFixed(2)} worth of Bitcoin</li>
@@ -414,7 +443,7 @@ export const DepositForm = () => {
               <Button 
                 onClick={resetForm}
                 variant="outline"
-                className="w-full"
+                className="w-full h-10 sm:h-11 text-sm sm:text-base touch-manipulation"
               >
                 Make Another Deposit
               </Button>

@@ -121,6 +121,42 @@ All colors MUST be HSL.
     position: relative;
     overflow-x: hidden;
     min-height: 100vh;
+    /* Improve touch scrolling on mobile */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent zoom on input focus on iOS */
+    -webkit-text-size-adjust: 100%;
     /* Removed fixed background - let CasinoBackground handle it */
+  }
+
+  /* Improve touch targets on mobile */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on game cards */
+  .tap-highlight-transparent {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Improve input styling on mobile */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"] {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  @media (max-width: 640px) {
+    /* Ensure proper spacing on small screens */
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 }

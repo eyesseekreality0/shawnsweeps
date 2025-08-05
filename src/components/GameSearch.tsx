@@ -15,7 +15,7 @@ export const GameSearch = ({ onSearchChange }: GameSearchProps) => {
   };
 
   return (
-    <div className="relative max-w-md mx-auto mb-6">
+    <div className="relative max-w-sm sm:max-w-md mx-auto mb-4 sm:mb-6">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
         <Input
@@ -23,7 +23,7 @@ export const GameSearch = ({ onSearchChange }: GameSearchProps) => {
           placeholder="Search games..."
           value={searchTerm}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="pl-10 bg-background/80 backdrop-blur-sm border-casino-gold/30 focus:border-casino-gold text-foreground placeholder:text-muted-foreground"
+          className="pl-10 h-10 sm:h-11 text-base bg-background/80 backdrop-blur-sm border-casino-gold/30 focus:border-casino-gold text-foreground placeholder:text-muted-foreground"
         />
       </div>
     </div>

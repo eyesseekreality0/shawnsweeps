@@ -1,4 +1,7 @@
 project_id = "vbeirjdjfvmtwkljscwb"
 
-[functions.create-speed-checkout]
+[functions.create-paidly-checkout]
+verify_jwt = false
+
+[functions.paidly-webhook]
 verify_jwt = false

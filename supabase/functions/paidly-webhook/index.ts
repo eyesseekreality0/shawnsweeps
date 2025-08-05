@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const webhookPayload = await req.json()
-    console.log('Speed webhook received:', webhookPayload)
+    console.log('Paidly webhook received:', webhookPayload)
 
     // Initialize Supabase client
     const supabase = createClient(
@@ -28,7 +28,7 @@ serve(async (req) => {
       .insert({
         event_type: webhookPayload.type || 'unknown',
         payload: webhookPayload,
-        source: 'speed'
+        source: 'paidly'
       })
 
     if (logError) {
@@ -36,41 +36,39 @@ serve(async (req) => {
     }
 
     // Process the webhook based on event type
-    if (webhookPayload.type === 'payment_link.completed' || 
-        webhookPayload.type === 'payment.succeeded' ||
-        webhookPayload.type === 'checkout_session.completed') {
+    if (webhookPayload.type === 'checkout.session.completed' || 
+        webhookPayload.type === 'payment.succeeded') {
       
-      const paymentId = webhookPayload.data?.object?.id || webhookPayload.data?.id
+      const sessionId = webhookPayload.data?.object?.id || webhookPayload.data?.id
       const metadata = webhookPayload.data?.object?.metadata || webhookPayload.data?.metadata
       
-      if (paymentId && metadata?.deposit_id) {
+      if (sessionId && metadata?.deposit_id) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'completed' })
-          .eq('speed_checkout_session_id', paymentId)
+          .eq('paidly_checkout_session_id', sessionId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as completed for payment:', paymentId)
+          console.log('Deposit marked as completed for session:', sessionId)
         }
       }
-    } else if (webhookPayload.type === 'payment_link.expired' ||
-               webhookPayload.type === 'checkout_session.expired' || 
+    } else if (webhookPayload.type === 'checkout.session.expired' || 
                webhookPayload.type === 'payment.failed') {
       
-      const paymentId = webhookPayload.data?.object?.id || webhookPayload.data?.id
+      const sessionId = webhookPayload.data?.object?.id || webhookPayload.data?.id
       
-      if (paymentId) {
+      if (sessionId) {
         const { error: updateError } = await supabase
           .from('deposits')
           .update({ status: 'failed' })
-          .eq('speed_checkout_session_id', paymentId)
+          .eq('paidly_checkout_session_id', sessionId)
 
         if (updateError) {
           console.error('Error updating deposit status:', updateError)
         } else {
-          console.log('Deposit marked as failed for payment:', paymentId)
+          console.log('Deposit marked as failed for session:', sessionId)
         }
       }
     }
@@ -84,7 +82,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error processing Speed webhook:', error)
+    console.error('Error processing Paidly webhook:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 

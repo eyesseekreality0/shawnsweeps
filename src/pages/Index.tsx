@@ -1,123 +1,315 @@
-import { useState, useMemo } from "react";
-import { CasinoBackground } from "@/components/CasinoBackground";
-import { DepositForm } from "@/components/DepositForm";
-import { GameSearch } from "@/components/GameSearch";
-import { games } from "@/data/games";
-import { ExternalLink } from "lucide-react";
+export interface Game {
+  id: string;
+  name: string;
+  imageUrl: string;
+  gameUrl: string;
+}
 
-const Index = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredGames = useMemo(() => {
-    if (!searchTerm) return games;
-    return games.filter(game => 
-      game.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm]);
-
-  const handleGameClick = (gameUrl: string) => {
-    window.open(gameUrl, '_blank', 'noopener,noreferrer');
-  };
-
-  return (
-    <div className="min-h-screen relative font-inter overflow-x-hidden">
-      <CasinoBackground />
-      <div className="relative z-10">
-        
-        {/* Logo Section */}
-        <section className="text-center py-2 sm:py-3 px-4">
-          <img 
-            src="/lovable-uploads/fe59b40d-e5fd-4762-858c-1276be42711b.png" 
-            alt="Shawn Sweepstakes Logo" 
-            className="mx-auto max-w-[280px] sm:max-w-xs md:max-w-sm w-full h-auto"
-          />
-        </section>
-
-        {/* Social Media Links */}
-        <section className="flex justify-center py-1 sm:py-2 px-4">
-          <a 
-            href="https://www.facebook.com/profile.php?id=61556412457080&mibextid=wwXIfr&mibextid=wwXIfr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="opacity-80 hover:opacity-100 transition-opacity touch-manipulation"
-          >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
-              <span className="text-white font-bold text-base sm:text-lg">f</span>
-            </div>
-          </a>
-        </section>
-
-        {/* Deposit Button */}
-        <section className="text-center py-2 sm:py-3 px-4">
-          <DepositForm />
-        </section>
-
-        {/* Promotional Banner */}
-        <section className="text-center py-2 sm:py-3 px-4">
-          <img 
-            src="/lovable-uploads/0a72a758-c5cd-4fee-a196-97a26fc87cde.png" 
-            alt="Special Promotion" 
-            className="mx-auto max-w-sm sm:max-w-xl lg:max-w-2xl w-full h-auto rounded-lg shadow-lg"
-          />
-        </section>
-
-        {/* Search Bar */}
-        <section className="px-3 sm:px-4 py-1">
-          <GameSearch onSearchChange={setSearchTerm} />
-        </section>
-
-        {/* Games Grid */}
-        <section className="px-3 sm:px-4 py-1 pb-6 sm:pb-8">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3 md:gap-4">
-              {filteredGames.map((game) => (
-                <div
-                  key={game.id}
-                  onClick={() => handleGameClick(game.gameUrl)}
-                  className="group cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 tap-highlight-transparent touch-manipulation"
-                >
-                  <div className="relative touch-manipulation">
-                    <div className="aspect-square rounded-full overflow-hidden border-2 border-casino-gold/30 group-hover:border-casino-gold transition-colors duration-300 shadow-lg group-hover:shadow-xl">
-                      <img
-                        src={game.imageUrl}
-                        alt={game.name}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        onError={(e) => {
-                          e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMUExQTFBIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iI0ZGRCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTQiPkdhbWU8L3RleHQ+Cjwvc3ZnPg==';
-                        }}
-                      />
-                    </div>
-                    
-                    {/* External link indicator */}
-                    <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 md:top-2 md:right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 bg-casino-gold rounded-full flex items-center justify-center shadow-lg">
-                        <ExternalLink className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-black" />
-                      </div>
-                    </div>
-                    
-                    {/* Game name (if available and not "Untitled") */}
-                    {game.name && game.name !== "Untitled" && (
-                      <div className="text-center mt-1 sm:mt-2">
-                        <p className="text-[10px] sm:text-xs md:text-sm text-casino-gold font-medium truncate px-0.5 sm:px-1 leading-tight">
-                          {game.name}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {filteredGames.length === 0 && (
-              <div className="text-center py-6 sm:py-8">
-                <p className="text-muted-foreground">No games found matching your search.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-      </div>
-    </div>
-  );
-};
-
-export default Index;
+export const games: Game[] = [
+  {
+    id: "megaspinsweeps",
+    name: "Mega Spin Sweeps",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "http://www.megaspinsweeps.com/index.html"
+  },
+  {
+    id: "vblink777",
+    name: "VBLink777",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://www.vblink777.club/"
+  },
+  {
+    id: "goldentreasure",
+    name: "Golden Treasure",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://www.goldentreasure.mobi/"
+  },
+  {
+    id: "orionstars",
+    name: "Orion Stars",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "http://start.orionstars.vip:8580/index.html"
+  },
+  {
+    id: "firekirin",
+    name: "Fire Kirin",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "http://start.firekirin.xyz:8580/index.html"
+  },
+  {
+    id: "rivermonster",
+    name: "River Monster",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://rm777.net/"
+  },
+  {
+    id: "riversweeps",
+    name: "Riversweeps",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://bet777.eu/"
+  },
+  {
+    id: "fortune2go",
+    name: "Fortune 2 Go",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://www.fortune2go20.com/mobile/Login/index.html"
+  },
+  {
+    id: "goldendragon",
+    name: "Golden Dragon",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://playgd.mobi/SSLobby/3733.0/web-mobile/index.html"
+  },
+  {
+    id: "bludragon",
+    name: "Blu Dragon",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "http://app.bluedragon777.com/"
+  },
+  {
+    id: "vegasx",
+    name: "VEGAS X",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://vegas-x.org/"
+  },
+  {
+    id: "ultrapanda",
+    name: "ULTRAPANDA",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://www.ultrapanda.mobi/"
+  },
+  {
+    id: "milkyways",
+    name: "MILKY WAYS",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://milkywayapp.xyz/"
+  },
+  {
+    id: "luckypenny",
+    name: "LUCKY PENNY",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "http://luckypenny.xyz:8580/index.html"
+  },
+  {
+    id: "gametime",
+    name: "Gametime",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "http://game-time.vip:8580/index.html"
+  },
+  {
+    id: "goldstar",
+    name: "Gold Star",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://goldstar.games/"
+  },
+  {
+    id: "100plus",
+    name: "100 Plus",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://99.100plus.me/lobby/1684487595/index.html?agreement=1&/player/release/"
+  },
+  {
+    id: "gamevault",
+    name: "Gamevault",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://download.gamevault999.com/"
+  },
+  {
+    id: "galaxyworld",
+    name: "Galaxy World",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://m.galaxyworld999.com/"
+  },
+  {
+    id: "magiccity",
+    name: "Magic City",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://www.magiccity777.com/SSLobby/3657.0/web-mobile/index.html"
+  },
+  {
+    id: "highstake",
+    name: "High Stake Sweeps",
+    imageUrl: "https://images.pexels.com/photos/1111597/pexels-photo-1111597.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop",
+    gameUrl: "https://dl.highstakesweeps.com/"
+  },
+  {
+    id: "sincity",
+    name: "Sin City",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/98333b44.jpg?v=0c91e9dc",
+    gameUrl: "https://sincitysweeps.net/"
+  },
+  {
+    id: "vegassweeps",
+    name: "Vegas Sweeps",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/bd38d36f.jpg?v=0c91e9dc",
+    gameUrl: "https://m.lasvegassweeps.com/"
+  },
+  {
+    id: "ignite",
+    name: "IGNITE",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/3603f518.png?v=0c91e9dc",
+    gameUrl: "https://casinoignite.vip/"
+  },
+  {
+    id: "cashfrenzy",
+    name: "Cashapp Frenzy",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a67374ce.jpg?v=0c91e9dc",
+    gameUrl: "https://www.cashfrenzy777.com/"
+  },
+  {
+    id: "acebook",
+    name: "ACEBOOK",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/09e14951.jpg?v=0c91e9dc",
+    gameUrl: "https://www.playacebook.mobi/"
+  },
+  {
+    id: "bluedragon2",
+    name: "Blue Dragon 2",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/637eb5ee.png?v=0c91e9dc",
+    gameUrl: "http://app.getbluedragon.com/"
+  },
+  {
+    id: "juwa777",
+    name: "Juwa777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/bebb5d9e.jpg?v=0c91e9dc",
+    gameUrl: "https://dl.juwa777.com/"
+  },
+  {
+    id: "pandamaster",
+    name: "Panda Master",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/0b6843e0.jpg?v=0c91e9dc",
+    gameUrl: "https://pandamaster.vip:8888/index.html"
+  },
+  {
+    id: "fishglory",
+    name: "Fish Glory",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/346fd5a6.jpg?v=0c91e9dc",
+    gameUrl: "https://www.fishglory.games/"
+  },
+  {
+    id: "vegasroll",
+    name: "Vegas Roll",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/7867671f.jpg?v=0c91e9dc",
+    gameUrl: "http://www.vegas-roll.com/m"
+  },
+  {
+    id: "mrallinone",
+    name: "Mr All In One",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/d6f9845f.jpg?v=0c91e9dc",
+    gameUrl: "https://www.mrallinone777.com/m"
+  },
+  {
+    id: "orionpower",
+    name: "ORION Power",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/6c415d9a.jpg?v=0c91e9dc",
+    gameUrl: "http://product.orionpower.games/v1001/"
+  },
+  {
+    id: "quakegame",
+    name: "Quake Game",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/0c63b506.jpg?v=0c91e9dc",
+    gameUrl: "https://www.quakegame.net/"
+  },
+  {
+    id: "vegasluck777",
+    name: "Vegas Luck 777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/961ffa7e.jpg?v=0c91e9dc",
+    gameUrl: "https://start.vegasluck777.com/"
+  },
+  {
+    id: "noble777",
+    name: "Noble 777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/21cf31e9.jpg?v=0c91e9dc",
+    gameUrl: "https://www.noble777.com/m"
+  },
+  {
+    id: "cashmachine777",
+    name: "Cash Machine 777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/d68e85e8.jpg?v=0c91e9dc",
+    gameUrl: "https://www.cashmachine777.com/m"
+  },
+  {
+    id: "gameroom777",
+    name: "Game Room 777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/92bca02e.jpg?v=0c91e9dc",
+    gameUrl: "https://www.gameroom777.com/m"
+  },
+  {
+    id: "luckystars",
+    name: "Lucky Stars",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/990e95bf.jpg?v=0c91e9dc",
+    gameUrl: "http://www.luckystars.games/m"
+  },
+  {
+    id: "slots88888",
+    name: "Slots 88888",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/035f8253.jpg?v=0c91e9dc",
+    gameUrl: "https://www.slots88888.com/m"
+  },
+  {
+    id: "winstar99999",
+    name: "Win Star 99999",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/b48ed188.jpg?v=0c91e9dc",
+    gameUrl: "http://server.winstar99999.com:8009/m"
+  },
+  {
+    id: "mafia77777",
+    name: "Mafia 77777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a3830c1f.jpg?v=0c91e9dc",
+    gameUrl: "http://product.mafia77777.com/v1003/"
+  },
+  {
+    id: "yolo777",
+    name: "YOLO 777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/e1b31467.jpg?v=0c91e9dc",
+    gameUrl: "https://yolo777.game/"
+  },
+  {
+    id: "fpc",
+    name: "FPC Mobile",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/2eb63b4e.png?v=0c91e9dc",
+    gameUrl: "https://fpc-mob.com/AD/index.html"
+  },
+  {
+    id: "winnersclub777",
+    name: "Winners Club 777",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a9e0fca0.jpg?v=0c91e9dc",
+    gameUrl: "https://www.winnersclub777.com/"
+  },
+  {
+    id: "legendfire",
+    name: "Legend Fire",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/8b67f370.jpg?v=0c91e9dc",
+    gameUrl: "https://www.legendfire.xyz/"
+  },
+  {
+    id: "firelinkplus",
+    name: "Fire Link Plus",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f592d30c.jpg?v=0c91e9dc",
+    gameUrl: "https://firelinkplus.com/"
+  },
+  {
+    id: "blackmamba",
+    name: "Black Mamba",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/b99b4435.jpg?v=0c91e9dc",
+    gameUrl: "https://blackmamba.mobi/"
+  },
+  {
+    id: "playorca",
+    name: "Play Orca",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/a281d47e.jpg?v=0c91e9dc",
+    gameUrl: "https://playorca.mobi/"
+  },
+  {
+    id: "playbdd",
+    name: "Play BDD",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/fcf9c9dd.jpg?v=0c91e9dc",
+    gameUrl: "https://www.playbdd.com/"
+  },
+  {
+    id: "kraken",
+    name: "The Kraken",
+    imageUrl: "https://shawn-sweepstakes.carrd.co/assets/images/gallery01/f6ee4ae8.jpg?v=0c91e9dc",
+    gameUrl: "https://getthekraken.com/"
+  }
+];

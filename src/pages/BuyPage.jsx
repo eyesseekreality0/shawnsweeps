@@ -18,8 +18,25 @@ const BuyPage = () => {
     setUserData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      const response = await fetch('/api/log-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        console.log('✅ Form data logged');
+      }
+    } catch (error) {
+      console.warn('❌ Failed to log form', error);
+    }
+
     setStep(2);
   };
 
@@ -64,7 +81,7 @@ const BuyPage = () => {
       if (event.origin !== 'https://sandbox-widget.wert.io') return;
       const { type, data } = event.data;
       if (type === 'purchase.success') {
-        alert(`🎉 Success, ${userData.name}! Your deposit of $${userData.amount} has been credited. Order ID: ${data.order_id}`);
+        alert(`🎉 Success, ${userData.name}! Your deposit of $${userData.amount} has been credited.`);
       }
     };
     window.addEventListener('message', handleMessage);
@@ -198,7 +215,7 @@ const BuyPage = () => {
             ></div>
 
             <p className="text-xs text-gray-500 mt-4">
-              Powered by secure blockchain payment processing. Your transaction is encrypted and protected.
+              Powered by secure blockchain payment processing.
             </p>
           </div>
         )}

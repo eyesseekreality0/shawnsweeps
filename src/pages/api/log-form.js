@@ -4,18 +4,13 @@ export default function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, email, username, game, phone, amount } = req.body;
-
+  // Log form data
   console.log('📋 FORM SUBMITTED:', {
+    ...req.body,
     timestamp: new Date().toISOString(),
-    name,
-    email,
-    username,
-    game,
-    phone,
-    amount,
     ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
   });
 
-  res.status(200).json({ success: true, message: 'Logged' });
+  // Send success response
+  res.status(200).json({ success: true, message: 'Form logged' });
 }

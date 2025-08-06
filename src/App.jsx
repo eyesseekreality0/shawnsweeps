@@ -1,4 +1,3 @@
-// src/App.jsx
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
 import BuyPage from './pages/BuyPage';
@@ -12,7 +11,7 @@ function App() {
             <Link to="/" className="text-2xl font-bold text-white">ShawnSweeps</Link>
             <Link
               to="/buy"
-              className="bg-gradient-to-r from-green-600 to-blue-600 px-6 py-2 rounded-full font-semibold text-white shadow-lg hover:from-green-700 hover:to-blue-700 transition transform hover:scale-105"
+              className="bg-gradient-to-r from-green-600 to-blue-600 px-6 py-2 rounded-full font-semibold text-white hover:from-green-700 hover:to-blue-700 transition"
             >
               💳 Make a Deposit
             </Link>
@@ -42,7 +41,7 @@ function Home() {
         <p className="text-xl mb-8">Win big with exciting sweepstakes games!</p>
         <Link
           to="/buy"
-          className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-2xl"
+          className="inline-block bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform"
         >
           💳 Make a Deposit
         </Link>

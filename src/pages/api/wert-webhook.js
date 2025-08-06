@@ -4,11 +4,6 @@ export default function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Log full webhook payload
-  console.log('💰 WERT WEBHOOK RECEIVED:', JSON.stringify(req.body, null, 2));
-
-  // Optional: Verify signature later
-  // For now, just log it
-
+  console.log('✅ WERT WEBHOOK RECEIVED:', JSON.stringify(req.body, null, 2));
   res.status(200).json({ received: true });
 }

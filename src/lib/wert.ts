@@ -14,7 +14,7 @@ export const createWertPayment = async (paymentData: {
     console.log('Creating Wert payment with data:', paymentData);
     
     const supabaseUrl = 'https://dhjopumeiapddbjyleyk.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoam9wdW1laWFwZGRianlsZXlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc0NzE2NzQsImV4cCI6MjA1MzA0NzY3NH0.Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8Ej8";
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoam9wdW1laWFwZGRianlsZXlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MzYyNzQsImV4cCI6MjA3MDAxMjI3NH0.i1mNvuRwKj7k43RmyPxZxHSjCsy8Uo5tBL7TqeOdiy4';
     
     const response = await fetch(`${supabaseUrl}/functions/v1/create-wert-payment`, {
       method: 'POST',
